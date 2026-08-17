@@ -23,6 +23,11 @@
 | 08 | [Risks & Fallbacks](./08-risks.md) | What will break and what we do instead |
 | 09 | [Assumptions & Decisions](./09-assumptions-and-decisions.md) | Every assumption made, every ADR |
 | **10** | **[Implementation Status](./10-implementation-status.md)** | **As-built: what exists, deviations, enforcement status, remaining work** |
+| — | [Hackathon Execution Plan](./HACKATHON_EXECUTION_PLAN.md) | Schedule, phases, wall-clock blocks, Golden Demo, submission preparation |
+
+**Where authority sits (D3).** Hackathon schedule, phases, Golden Demo and submission →
+`HACKATHON_EXECUTION_PLAN.md` · engineering execution and governance, Git/PR workflow, CODEOWNERS,
+gates, team ownership, AI-tooling policy, engineering Definition of Done → `07` · product scope → `02`.
 
 ## The one-paragraph version
 

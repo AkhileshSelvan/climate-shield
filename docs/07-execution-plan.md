@@ -1,5 +1,14 @@
 # 07 — Git Strategy, Team Split & 30-Hour Execution
 
+> **Authority (D3).** This document is canonical for **engineering execution and governance**:
+> branching and PR workflow, CODEOWNERS, integration checkpoints and gates, team ownership,
+> AI-tooling policy, communication cadence, and the engineering Definition of Done.
+>
+> It is **not** the hackathon schedule. Phases, wall-clock work blocks, the Golden Demo and
+> submission preparation are owned by
+> [`HACKATHON_EXECUTION_PLAN.md`](./HACKATHON_EXECUTION_PLAN.md).
+> Product scope is owned by [`02-mvp-scope.md`](./02-mvp-scope.md).
+
 ## 1. Git branching strategy
 
 **Trunk-based development with short-lived feature branches.** Not GitFlow — a `develop` branch adds
@@ -220,7 +229,11 @@ What *is* shared is the output contract, and it is tool-agnostic by design:
 
 ## 3. 30-hour execution sequence
 
-Assumes a **09:00 Friday** start. Adjust offsets to the actual schedule; keep the *shape*.
+**H0–H30 are relative engineering offsets, not the organizer's event clock.** H0 is whenever the
+team begins building; the sequence describes order and dependency, not calendar time. The
+authoritative wall-clock schedule — phases, session blocks, submission window — is
+[`HACKATHON_EXECUTION_PLAN.md`](./HACKATHON_EXECUTION_PLAN.md), which remains subject to the
+organizer's official timetable.
 
 ### H0 – H2 · Foundation *(all four together, in one room)*
 The highest-leverage two hours of the entire event.
@@ -340,11 +353,14 @@ precisely so that the fallback is exercised for eighteen hours before it is need
 ### H29 – H30 · Buffer
 Submission, final run-through, and deliberate stopping. **Nothing new is written in this hour.**
 
-## 4. Definition of Done
+## 4. Engineering Definition of Done
 
 A feature is done when: it is merged to `main`; the happy path was manually verified; it degrades
 gracefully when its dependency is unavailable; it appears in the demo script **or** is explicitly
 marked out-of-demo; and it does not break `make demo-reset`.
+
+This is the *engineering* bar. Demo and submission readiness are defined in
+[`HACKATHON_EXECUTION_PLAN.md`](./HACKATHON_EXECUTION_PLAN.md#definition-of-done).
 
 ## 5. Communication cadence
 
