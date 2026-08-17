@@ -101,23 +101,23 @@ sequenceDiagram
 
 Ordered by build dependency. Item *n* generally unblocks item *n+1*.
 
-| # | Feature | Definition of done | Owner |
+| # | Feature | Definition of done | Owner (issue) |
 |---|---------|--------------------|-------|
-| M1 | Phone + OTP auth (mock code `123456`), JWT, roles | Farmer logs in and reaches a session-scoped dashboard | A |
-| M2 | Farm registration — map pin, area, district; crop + sowing date | Farm and planting persisted, snapped to a grid cell | A + C |
-| M3 | Weather ingestion + cache: ≥30 yrs daily for ≥4 demo districts | `weather_observation` populated; API reads **only** from cache; provider selected by `WEATHER_PROVIDER` | B |
-| M4 | Crop calendar + phase-wise index computation | Given planting + year → cumulative rainfall, CDD, heat index for each phase | B |
-| M5 | **Burn-analysis risk engine** → trigger probability, expected loss, risk band, pure + gross premium | `POST /risk/assess` returns a full, persisted assessment in < 3 s | B |
-| M6 | Products + quote → **policy issuance with frozen trigger definition** | Policy row carries an immutable `trigger_definition` snapshot | A |
-| M7 | **Deterministic trigger engine**, tiered payouts, idempotent, audited | Re-running evaluation changes nothing; every run writes `policy_evaluation` | B |
-| M8 | Monitoring dashboard — season-to-date index vs threshold, days remaining | Farmer sees live position against their contract | C |
-| M9 | **Admin weather-simulation endpoint + console** | One click injects a drought scenario and re-evaluates — *the demo lever* | B + D |
-| M10 | Automatic payout creation, state machine, mock UPI disbursement | Trigger → payout → disbursed with no human input | B |
-| M11 | Alert / notification feed | Early-warning, trigger, and payout events visible to the farmer | C |
-| M12 | **Audit view** of an evaluation | Exact index values, data source, engine version, timestamp | C |
-| M13 | Deployed public URL **or** rehearsed offline `docker-compose` demo | The 4:30 script runs start to finish, twice, without intervention | A |
-| **M14** | **Offline fixture & replay system** — committed 35-yr weather, `FixtureProvider`, `make seed` / `demo-reset` / `demo-offline` | **The complete happy path runs with the network interface disabled.** Verified at H12, re-verified at H24 | **B** |
-| **M15** | **Architectural fitness test** — build fails if `services/trigger` or `services/payout` imports any AI module | The separation is enforced by CI, not by intention | **B** |
+| M1 | Phone + OTP auth (mock code `123456`), JWT, roles | Farmer logs in and reaches a session-scoped dashboard | Bhagavathianu |
+| M2 | Farm registration — map pin, area, district; crop + sowing date | Farm and planting persisted, snapped to a grid cell | Bhagavathianu + Karthik |
+| M3 | Weather ingestion + cache: ≥30 yrs daily for ≥4 demo districts | `weather_observation` populated; API reads **only** from cache; provider selected by `WEATHER_PROVIDER` | Kirishwaran |
+| M4 | Crop calendar + phase-wise index computation | Given planting + year → cumulative rainfall, CDD, heat index for each phase | Kirishwaran |
+| M5 | **Burn-analysis risk engine** → trigger probability, expected loss, risk band, pure + gross premium | `POST /risk/assess` returns a full, persisted assessment in < 3 s | Kirishwaran |
+| M6 | Products + quote → **policy issuance with frozen trigger definition** | Policy row carries an immutable `trigger_definition` snapshot | Bhagavathianu |
+| M7 | **Deterministic trigger engine**, tiered payouts, idempotent, audited | Re-running evaluation changes nothing; every run writes `policy_evaluation` | Kirishwaran |
+| M8 | Monitoring dashboard — season-to-date index vs threshold, days remaining | Farmer sees live position against their contract | Karthik |
+| M9 | **Admin weather-simulation endpoint + console** | One click injects a drought scenario and re-evaluates — *the demo lever* | Kirishwaran + Akhilesh |
+| M10 | Automatic payout creation, state machine, mock UPI disbursement | Trigger → payout → disbursed with no human input | Kirishwaran |
+| M11 | Alert / notification feed | Early-warning, trigger, and payout events visible to the farmer | Karthik |
+| M12 | **Audit view** of an evaluation | Exact index values, data source, engine version, timestamp | Karthik |
+| M13 | Deployed public URL **or** rehearsed offline `docker-compose` demo | The 4:30 script runs start to finish, twice, without intervention | Bhagavathianu |
+| **M14** | **Offline fixture & replay system** — committed 35-yr weather, `FixtureProvider`, `make seed` / `demo-reset` / `demo-offline` | **The complete happy path runs with the network interface disabled.** Verified at H12, re-verified at H24 | **Kirishwaran** |
+| **M15** | **Architectural fitness test** — build fails if `services/trigger` or `services/payout` imports any AI module | The separation is enforced by CI, not by intention | **Kirishwaran** |
 
 **M9 deserves a note.** The simulation endpoint is not a hack bolted on at hour 28 — it is the
 mechanism by which a 90-day insurance event becomes a 20-second stage moment. It is designed in
@@ -135,19 +135,19 @@ failing build.
 
 ## 3. SHOULD HAVE — build after all MUSTs are green
 
-| # | Feature | Value | Owner |
+| # | Feature | Value | Owner (issue) |
 |---|---------|-------|-------|
-| S1 | Claude plain-language risk explanation | Turns a number into a decision a farmer can act on | D |
-| S2 | Tamil ⇄ English toggle (`next-intl`) | Credibility with a Tamil Nadu judging panel; genuine accessibility | D |
-| S3 | Early-warning trigger probability (forecast + analogue years) | The *resilience* beat — warns before the loss, not after | B |
-| S4 | Historical trigger-years chart (which of 35 years would have paid) | Makes the risk model legible in one glance | D |
-| S5 | Monte Carlo pricing (10k draws over fitted distributions) | Smoother estimate than 35 samples | B |
-| S6 | LightGBM threshold optimisation / basis-risk score | The strongest "real ML" claim available to us | B |
-| S7 | Policy certificate (PDF + QR) | Tangible artifact; farmers trust paper | D |
-| S8 | Admin portfolio view — exposure, expected loss, solvency | Shows we understand the *insurer* side, not just the farmer side | D |
-| S9 | Unit tests on index-window arithmetic | The one place a silent wrong number would humiliate us on stage | B |
-| S10 | Multi-peril: excess rainfall + heat stress alongside deficit | Breadth of cover | B |
-| S11 | Rate limiting on OTP request | Basic abuse resistance | A |
+| S1 | Claude plain-language risk explanation | Turns a number into a decision a farmer can act on | Akhilesh |
+| S2 | Tamil ⇄ English toggle (`next-intl`) | Credibility with a Tamil Nadu judging panel; genuine accessibility | Akhilesh |
+| S3 | Early-warning trigger probability (forecast + analogue years) | The *resilience* beat — warns before the loss, not after | Kirishwaran |
+| S4 | Historical trigger-years chart (which of 35 years would have paid) | Makes the risk model legible in one glance | Akhilesh |
+| S5 | Monte Carlo pricing (10k draws over fitted distributions) | Smoother estimate than 35 samples | Kirishwaran |
+| S6 | LightGBM threshold optimisation / basis-risk score | The strongest "real ML" claim available to us | Kirishwaran |
+| S7 | Policy certificate (PDF + QR) | Tangible artifact; farmers trust paper | Akhilesh |
+| S8 | Admin portfolio view — exposure, expected loss, solvency | Shows we understand the *insurer* side, not just the farmer side | Akhilesh |
+| S9 | Unit tests on index-window arithmetic | The one place a silent wrong number would humiliate us on stage | Kirishwaran |
+| S10 | Multi-peril: excess rainfall + heat stress alongside deficit | Breadth of cover | Kirishwaran |
+| S11 | Rate limiting on OTP request | Basic abuse resistance | Bhagavathianu |
 
 ## 4. NICE TO HAVE — only if genuinely ahead of schedule
 

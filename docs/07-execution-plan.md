@@ -33,19 +33,40 @@ The directory layout in [01 §4](./01-architecture.md#4-repository-layout-propos
 developer owns directories the others do not touch. `CODEOWNERS` encodes it:
 
 ```
-/backend/app/models/      @dev-a
-/backend/app/core/        @dev-a
-/backend/alembic/         @dev-a
-/backend/app/services/    @dev-b
-/frontend/app/(farmer)/   @dev-c
-/frontend/components/map/ @dev-c
-/frontend/app/(admin)/    @dev-d
-/frontend/components/ui/  @dev-d
-/backend/app/schemas/     @dev-a @dev-b   # shared — change only via PR, announce in channel
+# Backend + database + APIs                          -> issue #5
+/backend/app/core/                @Bhagavathianu
+/backend/app/models.py            @Bhagavathianu
+/backend/app/api/                 @Bhagavathianu
+/backend/alembic/                 @Bhagavathianu
+/backend/requirements.txt         @Bhagavathianu
+/docker-compose.yml               @Bhagavathianu
+
+# Data, policy engine, fixtures, tests                -> issue #7
+/backend/app/services/weather/    @Kirishwaran
+/backend/app/services/trigger_engine.py  @Kirishwaran
+/backend/app/services/payout_engine.py   @Kirishwaran
+/backend/app/services/evaluation.py      @Kirishwaran
+/backend/seeds/                   @Kirishwaran
+/backend/tests/                   @Kirishwaran
+
+# AI / risk engine + architecture                     -> issue #4
+/backend/app/services/risk/       @AkhileshSelvan
+/backend/app/services/explain/    @AkhileshSelvan
+/docs/                            @AkhileshSelvan
+
+# Frontend                                            -> issue #6
+/frontend/                        @Karthik
+
+# Shared contract — change by PR only, announce in channel
+/backend/app/schemas.py           @Bhagavathianu @AkhileshSelvan
 ```
 
-`backend/app/schemas/` is the one genuinely shared surface, which is exactly why it is written first
-and changed carefully.
+`backend/app/schemas.py` is the one genuinely shared surface — it is the contract Karthik's frontend
+generates its client from — which is exactly why it changes by PR only and gets announced.
+
+`backend/app/services/` is split by *concern*, not owned wholesale: Bhagavathianu owns the API and
+persistence around it, Kirishwaran owns the policy/trigger/weather logic inside it, and Akhilesh owns
+the risk and explanation modules when they land. That split follows the issue boundaries exactly.
 
 ### Integration checkpoints
 
@@ -66,89 +87,115 @@ Every 6 hours, **everyone merges to `main`**, the smoke test runs, and the build
 
 ## 2. Four-person work split
 
-Boundaries are drawn to **minimise shared files**, not to equalise line counts.
+**Ownership is defined by GitHub issues #4–#7, which are the source of truth.** The roles below
+restate those issues in build order; where they differ, the issues win.
 
-### Dev A — Platform & API Core
-**Owns:** `backend/app/{core,models,api/v1}`, `alembic/`, `docker-compose.yml`, deployment, CI
+Boundaries are drawn to **minimise shared files**, not to equalise line counts. Nobody works outside
+their boundary without coordinating first.
 
-- Repo scaffold, `.gitignore` Node entries, `Makefile`, CI workflow
-- Full schema + Alembic migrations ([03](./03-data-model.md))
-- Auth: OTP flow, JWT, role dependencies
-- CRUD: farms, plantings, crops, products
-- Policy issuance with trigger freezing
-- Deployment: Supabase, Render, Vercel wiring; `.env.example`
+| Owner | Issue | Domain |
+|-------|-------|--------|
+| **Akhilesh** | [#4](https://github.com/AkhileshSelvan/climate-shield/issues/4) | Product owner · AI/ML · system architecture |
+| **Bhagavathianu** | [#5](https://github.com/AkhileshSelvan/climate-shield/issues/5) | Backend · database · APIs |
+| **Karthik** | [#6](https://github.com/AkhileshSelvan/climate-shield/issues/6) | Frontend · dashboard · UI/UX |
+| **Kirishwaran** | [#7](https://github.com/AkhileshSelvan/climate-shield/issues/7) | Data/research · policy engine · testing · presentation |
 
-**Critical path:** the schema and the auth stub must land by **H4** — three people are blocked
-until they do. Dev A ships the migration before touching anything else.
+Workflow for everyone: **issue checklist → feature branch → PR → review → merge.**
 
-### Dev B — Risk, Trigger & Payout Engine
-**Owns:** `backend/app/services/{weather,risk,trigger,payout}`, `backend/app/jobs/`
+---
 
-- Open-Meteo client; 35-year backfill for 4 districts; grid-cell snapping
-- Phase-wise index computation (cumulative rainfall, CDD, heat degree-days)
-- **Burn analysis engine** + premium calculation ([05](./05-ai-ml-design.md))
-- **Deterministic trigger evaluator** — idempotent, audited, unit-tested
-- Payout state machine + ledger
-- `/admin/simulate/weather` — the demo lever
-- Monte Carlo, analogue-year early warning, LightGBM threshold optimisation (SHOULDs)
+### Akhilesh — Product, AI/ML & Architecture · [#4](https://github.com/AkhileshSelvan/climate-shield/issues/4)
+**Owns:** `backend/app/services/risk/`, `backend/app/services/explain/`, `docs/`
 
-**Highest-risk workstream.** Starts the weather backfill at **H2** — it is the long pole and
-everything downstream needs the cache populated. Owns the only unit tests that are mandatory
-(index-window arithmetic).
+- **Tier-1 burn-analysis risk engine** — the mandatory risk component ([05](./05-ai-ml-design.md))
+- Risk-score input/output contract, so Bhagavathianu can expose it and Karthik can render it
+- Claude explanation layer (optional enhancement — must degrade to a static per-band string)
+- MVP scope authority: **the only person who can approve work outside the agreed scope** ([02 §6](./02-mvp-scope.md#6-scope-discipline-rules))
+- Architecture review on major PRs; cross-workstream integration
+- Technical answers for judge Q&A ([06](./06-demo-script.md#judge-qa--prepared-answers))
 
-### Dev C — Farmer Frontend
-**Owns:** `frontend/app/{(auth),(farmer)}`, `frontend/components/map/`
+**Working rule from #4:** keep AI out of the payout authorization path. Risk prediction informs the
+product; deterministic trigger logic controls settlement. This is enforced by
+`tests/test_architecture.py`, which fails the build on violation.
 
-- App shell, routing, auth screens, session handling
-- **Map-based farm registration** (Leaflet) — the demo's first visual moment
-- Crop and sowing-date entry
-- Risk assessment view
-- Quote → policy purchase flow
-- **Monitoring dashboard** — season tracker against threshold
-- Alerts feed, payout view, audit view
-- Mobile-responsive throughout (it is presented as a farmer's phone)
+**Critical path:** the risk engine is the largest remaining gap between plan and code. Nothing else
+blocks on it, which is exactly why it can slip unnoticed.
 
-Works against the **generated API client** from hour 3, with MSW mocks until endpoints land. Never
-blocked waiting for Dev A.
+---
 
-### Dev D — AI/Risk Visualisation, Admin Simulation, Demo Systems & Documentation
-**Owns:** `frontend/app/(admin)`, `frontend/components/{ui,charts}`, `frontend/messages/`,
-`backend/app/services/explain/`, `backend/seeds/{demo,explanations}/`, `docs/`
+### Bhagavathianu — Backend, Database & APIs · [#5](https://github.com/AkhileshSelvan/climate-shield/issues/5)
+**Owns:** `backend/app/{core,api}`, `models.py`, `alembic/`, `requirements.txt`, `docker-compose.yml`
 
-**This is a full technical workstream.** Dev D writes backend and frontend code throughout, and
-owns some of the most demo-critical software in the repository.
+- FastAPI application, routers, dependency wiring
+- SQLAlchemy models and Alembic migrations ([03](./03-data-model.md))
+- **Shared PostgreSQL** — stand up one instance the whole team points at
+- Auth: OTP flow, JWT, role dependencies (not yet started)
+- **Stable OpenAPI contract** — Karthik generates his typed client from it, so breaking changes get announced
+- Deployment and environment configuration
 
-**Backend**
-- **Claude explanation service** — prompt construction, structured-payload contract, response
-  validation (rejects any number not present in the input), caching, static per-band fallbacks
-- **Async generation pipeline** so explanation never blocks a risk response
-- **Demo seed builders** — `make seed-demo`, the pre-warmed assessment, pre-generated explanations
-- Contributes the demo half of the fixture system with Dev B (M14)
+> **Already delivered — do not re-implement.** PR #3 completes most of #5's checklist: the
+> `WeatherProvider` abstraction with cache and fixture fallback, trigger/payout idempotency,
+> `Float` → `Decimal(14,2)`, the move toward shared PostgreSQL, `requirements.txt`, and backend
+> tests. The task on #5 is to **review and merge PR #3**, then continue with auth and the shared
+> database instance. Re-writing that work would be the duplication #4 warns against.
 
-**Frontend**
-- **Design system:** shadcn setup, tokens, light/dark — done early, unblocks Dev C
-- **Risk visualisation:** 35-year trigger-years chart, season rainfall tracker vs threshold,
-  forecast band, analogue-year projection display, portfolio exposure view. *This is how the risk
-  engine becomes legible — the charts are the argument that the model is real.*
-- **Admin simulation console** — the on-stage control surface for M9
-- **i18n:** Tamil/English catalogues, toggle, locale-aware number and date formatting
+---
 
-**Documentation & demo systems**
-- Keeps `docs/` current as decisions change; records approved scope amendments
-- `README.md` rewrite at H24, architecture diagram, screenshots
-- Demo script maintenance, rehearsal coordination, backup recording, statistic verification
+### Karthik — Frontend, Dashboard & UI/UX · [#6](https://github.com/AkhileshSelvan/climate-shield/issues/6)
+**Owns:** `frontend/` entirely
 
-> Dev D is a developer, not a presenter who also codes. The demo-systems work — simulation console,
-> seed builders, pre-generated explanations, reset tooling — is engineering, and it is what makes
-> the 4:30 script executable at all. Documentation sits here because the person who builds the admin
-> console and the charts has the clearest view of how the whole system fits together.
->
-> **Presenting is a separate decision made at H26**, and it goes to whoever is most rested and most
-> fluent — which may well be someone else.
+- Next.js foundation, design system, reusable components
+- Farmer and farm registration flow (map pin, crop, sowing date)
+- Climate-risk dashboard and risk visualisation
+- Policy/coverage view, monitoring and alerts, payout/settlement status
+- Integration against the OpenAPI contract — **generate the client, never hand-write it**
+- Loading, empty, error and **offline/demo** states
+- Responsive: it is presented as a farmer's phone
+
+**Unblocked from now.** The backend contract is stable and documented at `/docs`, and every
+endpoint works offline from fixtures — so the frontend can be built and demonstrated without
+waiting on live weather or on the risk engine.
+
+**Scope discipline:** the golden path only. Extra screens are the most common way a hackathon
+frontend runs out of time.
+
+---
+
+### Kirishwaran — Data, Research, Policy Engine & Testing · [#7](https://github.com/AkhileshSelvan/climate-shield/issues/7)
+**Owns:** `backend/app/services/{weather,trigger_engine,payout_engine,evaluation}`, `backend/seeds/`, `backend/tests/`
+
+**This is a technical workstream.** Presentation is a secondary responsibility, not the role.
+
+- **Weather data research** — evaluate sources, document the settlement-source argument
+- **Prepare and validate the demo dataset**: run `make fixtures-live` to replace the current
+  synthetic fixtures with real ERA5. **This is the single highest-priority task on the board.**
+- Define transparent trigger rules — explicit units, windows and thresholds ([04](./04-api-design.md))
+- Policy and trigger-engine logic, against Bhagavathianu's API contract
+- **Test cases for trigger boundaries, crop windows and payout scenarios** — owns `backend/tests/`
+- Validate the demo scenario and its audit evidence
+- Research/evidence notes behind the pitch; **verify every statistic before it is spoken**
+  ([06](./06-demo-script.md#sources-to-verify-before-pitching))
+- Deck content, judge Q&A prep, end-to-end rehearsal including the offline fallback
+
+**Why the engines sit here:** the trigger and payout engines are policy logic, not API plumbing.
+Keeping them with the person who defines the rules and writes the tests puts the specification and
+its verification in the same pair of hands.
+
+---
 
 ### Shared responsibilities
-Everyone: seeds their own domain's fixtures, writes their own `.env.example` entries, keeps `main`
-green, and updates the schema contract via PR with an announcement.
+Everyone: seeds their own domain's fixtures, keeps `main` green, works from their issue checklist,
+and announces changes to `backend/app/schemas.py` before merging.
+
+### Where the workstreams touch
+
+| Boundary | Rule |
+|----------|------|
+| Risk engine ↔ API | Akhilesh defines the contract in `schemas.py`; Bhagavathianu exposes it |
+| Policy engine ↔ API | Kirishwaran owns the logic; Bhagavathianu owns the route that calls it |
+| API ↔ Frontend | OpenAPI is the interface. Karthik generates; breaking changes get announced |
+| Fixtures ↔ Demo | Kirishwaran owns both, so demo data and demo script cannot drift apart |
+| Anything ↔ Scope | Only Akhilesh approves work outside the agreed MVP scope |
 
 ## 3. 30-hour execution sequence
 
@@ -181,7 +228,7 @@ curl -sS -o /dev/null -w "%{http_code}\n" \
 
 | Result | Action |
 |--------|--------|
-| `200` on ≥ 1 laptop | That laptop becomes the **fixture-generation machine**. Dev B fetches all 35 years for 4 districts there and **commits the JSON immediately** — before writing any other code. |
+| `200` on ≥ 1 laptop | That laptop becomes the **fixture-generation machine**. Kirishwaran runs `make fixtures-live` there and **commits the JSON immediately**. |
 | `200` on none | Retry on a phone hotspot. Still failing → switch to synthetic fixtures from published regional normals, labelled `"synthetic": true`. Decide by **H4**, not H8. |
 | Works now, fails at the venue | Irrelevant — fixtures are committed and `FixtureProvider` is the default. |
 
@@ -192,22 +239,22 @@ curl -sS -o /dev/null -w "%{http_code}\n" \
 quantity rather than an assumption. Do not proceed otherwise.
 
 ### H2 – H6 · Parallel foundations
-| Dev | Work |
-|-----|------|
-| A | Schema + migrations + auth (OTP, JWT, roles) — **must land by H4** |
-| B | Open-Meteo client; **start the 35-year backfill** (long-running); grid-cell snapping |
-| C | App shell, auth screens, map component with mock data |
-| D | Design system, chart components against mock data, i18n scaffold |
+| Owner | Work |
+|-------|------|
+| Bhagavathianu | Schema + migrations + auth (OTP, JWT, roles) — **must land by H4** |
+| Kirishwaran | Open-Meteo client; **start the 35-year backfill** (long-running); grid-cell snapping |
+| Karthik | App shell, auth screens, map component with mock data |
+| Akhilesh | Design system, chart components against mock data, i18n scaffold |
 
 **`checkpoint-1` at H6:** login works, a farm can be created and read.
 
 ### H6 – H12 · Core domain
-| Dev | Work |
-|-----|------|
-| A | Farms, plantings, crops, products endpoints; reference seeds |
-| B | Phase-wise index computation; **burn analysis**; `POST /risk/assess`; **finish M14 fixture system** |
-| C | Farm registration wired to the real API; risk view |
-| D | Risk charts on real assessment data; Claude explanation service; demo seed builders |
+| Owner | Work |
+|-------|------|
+| Bhagavathianu | Farms, plantings, crops, products endpoints; reference seeds |
+| Kirishwaran | Phase-wise index computation; **burn analysis**; `POST /risk/assess`; **finish M14 fixture system** |
+| Karthik | Farm registration wired to the real API; risk view |
+| Akhilesh | Risk charts on real assessment data; Claude explanation service; demo seed builders |
 
 **`checkpoint-2` at H12 — two gates, both hard:**
 1. Register a farm → receive a **real** risk score from real cached weather. This is the moment the
@@ -219,12 +266,12 @@ If either slips, cut SHOULDs immediately. The offline gate is checked at H12 rat
 precisely so that the fallback is exercised for eighteen hours before it is needed.
 
 ### H12 – H16 · Insurance mechanics
-| Dev | Work |
-|-----|------|
-| A | Quote + policy issuance with trigger freezing; deploy to staging |
-| B | **Trigger evaluator**; scheduler; idempotency; index-window unit tests |
-| C | Policy purchase flow; monitoring dashboard |
-| D | Admin simulation console; Tamil catalogue |
+| Owner | Work |
+|-------|------|
+| Bhagavathianu | Quote + policy issuance with trigger freezing; deploy to staging |
+| Kirishwaran | **Trigger evaluator**; scheduler; idempotency; index-window unit tests |
+| Karthik | Policy purchase flow; monitoring dashboard |
+| Akhilesh | Admin simulation console; Tamil catalogue |
 
 **`checkpoint-3` at H16:** a policy can be issued and evaluated.
 
@@ -233,12 +280,12 @@ precisely so that the fallback is exercised for eighteen hours before it is need
 > exhausted people at hour 28 is a worse outcome than four rested people with one fewer feature.
 > The pair that stays awake takes low-conflict work.
 
-| Dev | Work |
-|-----|------|
-| A | Payout endpoints; alerts; production deploy |
-| B | Payout state machine; ledger; **`/admin/simulate/weather`**; early-warning projection |
-| C | Alerts feed; payout view; audit view |
-| D | Portfolio view; **start the pitch deck** |
+| Owner | Work |
+|-------|------|
+| Bhagavathianu | Payout endpoints; alerts; production deploy |
+| Kirishwaran | Payout state machine; ledger; **`/admin/simulate/weather`**; early-warning projection |
+| Karthik | Alerts feed; payout view; audit view |
+| Akhilesh | Portfolio view; **start the pitch deck** |
 
 **`checkpoint-4` at H20:** full happy path — register → assess → buy → monitor → simulate → trigger
 → payout — works locally.

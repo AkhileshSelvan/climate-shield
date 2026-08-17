@@ -85,12 +85,43 @@ Each is a deliberate, recorded choice — not drift.
 | `make test` | Test suite |
 | `make fixtures-live` | **Only** networked target: refresh fixtures from Open-Meteo |
 
-## 7. Remaining work, in priority order
+## 7. Ownership (issues #4–#7)
 
-1. **Replace synthetic fixtures with real ERA5** (`make fixtures-live` from a machine with access). Top blocker — everything else is honest engineering on placeholder data.
-2. **Tier-1 burn analysis** (M5) — the mandatory risk engine, still entirely absent. The largest gap between plan and reality.
-3. Tiered payouts (25/50/100) replacing the flat 30 %.
-4. Point the team at one shared PostgreSQL instance.
-5. Crop calendars and sowing-date-anchored windows.
-6. DB trigger blocking `UPDATE` of policy trigger terms after issuance.
-7. Authentication (M1), frontend (M2, M8), alerts (M11), audit view (M12).
+GitHub issues #4–#7 are the source of truth for who owns what. Mapping onto the code that exists:
+
+| Area | Owner | Issue |
+|------|-------|-------|
+| `app/services/risk/`, `app/services/explain/` *(not yet built)*, `docs/` | Akhilesh | [#4](https://github.com/AkhileshSelvan/climate-shield/issues/4) |
+| `app/core/`, `app/models.py`, `app/api/`, `alembic/`, `requirements.txt`, `docker-compose.yml` | Bhagavathianu | [#5](https://github.com/AkhileshSelvan/climate-shield/issues/5) |
+| `frontend/` *(not yet started)* | Karthik | [#6](https://github.com/AkhileshSelvan/climate-shield/issues/6) |
+| `app/services/{weather,trigger_engine,payout_engine,evaluation}`, `seeds/`, `tests/` | Kirishwaran | [#7](https://github.com/AkhileshSelvan/climate-shield/issues/7) |
+
+`app/schemas.py` is shared between Bhagavathianu and Akhilesh — it is the contract Karthik's client
+is generated from, so it changes by PR only, with an announcement.
+
+### Overlap to resolve before anyone starts coding
+
+**PR #3 already completes most of issue #5's checklist** — the `WeatherProvider` abstraction with
+cache and fixture fallback, trigger/payout idempotency, `Float` → `Decimal(14,2)`, the move toward
+shared PostgreSQL, dependency management, and backend tests. It also delivers part of #7 (fixtures,
+trigger rules, test suite).
+
+**The action on #5 is to review and merge PR #3, not to re-implement it.** Re-doing that work is
+precisely the duplication the coordination note warns against. What remains genuinely open on #5 is
+auth and standing up the shared PostgreSQL instance.
+
+## 8. Remaining work, in priority order
+
+| # | Task | Owner | Issue |
+|---|------|-------|-------|
+| 1 | **Replace synthetic fixtures with real ERA5** — `make fixtures-live`. Top blocker: everything else is honest engineering on placeholder data. | Kirishwaran | #7 |
+| 2 | **Review and merge PR #3**, then stand up the shared PostgreSQL instance | Bhagavathianu | #5 |
+| 3 | **Tier-1 burn analysis** — the mandatory risk engine, still entirely absent. Largest plan-vs-reality gap. | Akhilesh | #4 |
+| 4 | **Next.js foundation and farmer journey** — unblocked now; the API is stable and works offline | Karthik | #6 |
+| 5 | Tiered payouts (25/50/100) replacing the flat 30 % | Kirishwaran | #7 |
+| 6 | Authentication (M1) | Bhagavathianu | #5 |
+| 7 | Crop calendars and sowing-date-anchored windows | Kirishwaran | #7 |
+| 8 | DB trigger blocking `UPDATE` of policy terms after issuance | Bhagavathianu | #5 |
+| 9 | Alerts (M11), audit view (M12) | Karthik | #6 |
+
+Tasks 1–4 are independent and can run in parallel starting now.
