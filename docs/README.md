@@ -23,6 +23,7 @@
 | 08 | [Risks & Fallbacks](./08-risks.md) | What will break and what we do instead |
 | 09 | [Assumptions & Decisions](./09-assumptions-and-decisions.md) | Every assumption made, every ADR |
 | **10** | **[Implementation Status](./10-implementation-status.md)** | **As-built: what exists, deviations, enforcement status, remaining work** |
+| **11** | **[Risk Engine](./11-risk-engine.md)** | **Tier-1 burn analysis: algorithm, formula, API contract, assumptions, limitations** |
 
 ## The one-paragraph version
 
