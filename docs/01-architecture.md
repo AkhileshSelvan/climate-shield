@@ -2,8 +2,9 @@
 
 ## 1. Design principles
 
-These four constraints resolve most downstream arguments. When a decision is contested, check it
-against these before debating.
+These six constraints resolve most downstream arguments. When a decision is contested, check it
+against these before debating. All six were ratified by the project owner at plan sign-off and are
+not open for renegotiation during the build.
 
 1. **Determinism at the money boundary.** Anything that moves money — index computation, threshold
    comparison, payout percentage — is pure, versioned, and replayable from stored inputs. No model
@@ -18,6 +19,14 @@ against these before debating.
 4. **One data path.** The browser talks to the API. The API owns the database. No direct DB access
    from the frontend, no second write path. With four developers and thirty hours, a second path is
    a guaranteed inconsistency bug at hour 27.
+5. **Offline is a build target, not a contingency.** The complete happy path — registration through
+   payout — must run from committed fixtures with no live weather API and no internet. This is a
+   MUST-have feature with an owner and a deadline (see [§3.10](#310-offline-fixture--replay-system)),
+   not a fallback we hope not to need.
+6. **AI cannot authorise money.** The trigger evaluator is physically separated from every AI
+   module: no shared imports, no shared process boundary crossing, and an architectural fitness test
+   that fails the build if the separation is violated. Enforcement detail in
+   [§3.7](#37-parametric-trigger-engine--deterministic-rule-evaluator-over-frozen-jsonb-contracts).
 
 ## 2. System architecture
 
@@ -41,7 +50,7 @@ graph TB
     end
 
     subgraph data["Data"]
-        PG[("PostgreSQL 16<br/>+ PostGIS")]
+        PG[("PostgreSQL 16<br/>PostGIS optional")]
     end
 
     subgraph ext["External (batch only)"]
@@ -105,24 +114,43 @@ FastAPI specifically, over Django or Flask:
 Supporting: SQLAlchemy 2.0 (typed ORM) · Alembic (migrations) · APScheduler (in-process daily job)
 · `python-jose` + `passlib` (JWT) · `httpx` (async weather fetch) · `structlog` (JSON logs).
 
-### 3.3 Database — **PostgreSQL 16 + PostGIS, hosted on Supabase**
+### 3.3 Database — **PostgreSQL 16, hosted on Supabase · PostGIS optional**
 
 | Requirement | How Postgres serves it |
 |-------------|------------------------|
-| Geospatial farm boundaries | PostGIS `GEOGRAPHY(POINT/POLYGON)`, `ST_Area`, `ST_DWithin` |
+| Farm location | **`latitude` / `longitude` `NUMERIC(9,6)` by default** — see the PostGIS note below |
 | Flexible trigger contracts | `JSONB` + GIN index — schema-free rules, queryable |
 | Weather time series | ~35 yrs × 365 d × N cells; a composite PK and BRIN index handles it comfortably |
 | Money correctness | `NUMERIC(14,2)` — **never** floats for currency |
 | Audit | Append-only tables + transactional integrity |
 
 **Hosted on Supabase** for one reason that dominates all others: *four developers share one
-database from hour one.* No "works on my machine", no divergent local schemas, no seed drift. The
-free tier includes PostGIS. `docker-compose` Postgres stays in the repo as an offline fallback and
-for the unplugged demo.
+database from hour one.* No "works on my machine", no divergent local schemas, no seed drift.
+`docker-compose` Postgres stays in the repo for local parity and for the unplugged demo.
 
-*Rejected:* MongoDB (we need transactional money and relational joins); SQLite (no PostGIS, no
-concurrent writers); a separate time-series DB (a second store to operate for data that Postgres
-handles fine at this scale).
+#### PostGIS is optional — plain lat/lon is the default
+
+**Start with `latitude` / `longitude` as `NUMERIC(9,6)` columns. Do not install PostGIS unless
+something in the MVP actually needs it — and nothing currently does.**
+
+Everything the MVP requires is arithmetic:
+
+| Operation | Without PostGIS |
+|-----------|-----------------|
+| Snap a farm to a weather grid cell | `round(lat / 0.1) * 0.1` |
+| Find farms in a district | `WHERE district = ?` — an indexed string column |
+| Farm area | Entered by the farmer, not derived from a polygon |
+| Distance between two points | Haversine in ~8 lines of Python |
+
+Adopt PostGIS **only** if a concrete need appears — polygon boundary drawing, radius search, or
+spatial joins — and only if it costs less than 30 minutes. Supabase ships it pre-installed, so the
+upgrade is `CREATE EXTENSION postgis;` plus an Alembic migration converting the two columns to
+`GEOGRAPHY(POINT,4326)`. Designing for the swap costs nothing today; installing it at hour 3 can
+cost an afternoon on SRIDs and GeoAlchemy types.
+
+*Rejected:* MongoDB (we need transactional money and relational joins); SQLite (no concurrent
+writers, and the four-developers-one-database property is the whole point); a separate time-series
+DB (a second store to operate for data Postgres handles fine at this scale).
 
 ### 3.4 AI / ML risk engine — **pandas + NumPy + scikit-learn / LightGBM, in-process**
 
@@ -209,6 +237,27 @@ Design decisions inside the engine:
   arithmetic is the single most likely source of a silently wrong number on stage, so it is
   eliminated by design and covered by unit tests.
 
+#### Enforced separation from AI — mechanism, not just policy
+
+"The LLM never decides payouts" is only true if something stops it. Four mechanisms, in increasing
+order of strength:
+
+1. **Module isolation.** `services/trigger/` and `services/payout/` import from `models/`,
+   `schemas/`, and the standard library only. They import nothing from `services/risk/`,
+   `services/explain/`, `sklearn`, `lightgbm`, or any HTTP client.
+2. **An architectural fitness test** (`tests/test_architecture.py`) walks the import graph of
+   `services/trigger/` and `services/payout/` and **fails the build** if a forbidden module appears.
+   This is the only test that gates CI from hour one, because it is the only invariant that cannot
+   be restored by fixing a bug later.
+3. **Single write path for payouts.** `payout` rows are created by exactly one function, called from
+   exactly one place — the evaluation job. No API route creates one. There is no
+   `POST /payouts` endpoint, deliberately.
+4. **Column-level separation.** LLM output is written only to `risk_assessment.explanation_en` /
+   `explanation_ta`. No code path reads those columns back into a computation.
+
+The practical test: delete `services/explain/` and `services/risk/` entirely, and the trigger engine
+must still evaluate every policy correctly. If it cannot, the separation has been broken.
+
 ### 3.8 Payout simulation — **state machine + append-only ledger, mock UPI**
 
 ```
@@ -232,16 +281,78 @@ triggered → pending → approved → disbursed
 |-----------|---------|----------|
 | Frontend | **Vercel** — Git-push deploy, preview URL per PR | `next build && next start` on a laptop |
 | Backend | **Render** (or Railway/Fly.io) — Docker, free tier | `uvicorn` on a laptop + Cloudflare Tunnel |
-| Database | **Supabase** managed Postgres + PostGIS | `docker-compose` Postgres, seeded from committed fixtures |
+| Database | **Supabase** managed Postgres (PostGIS optional) | `docker-compose` Postgres, seeded from committed fixtures |
 | Scheduler | APScheduler in the API process | Manual "Run evaluation now" admin button |
 | Secrets | Platform env vars; `.env.example` committed, `.env` never | — |
 
 **Preview URLs per PR are worth calling out:** they let the team see each other's work without
 merging, which is how four people stay unblocked.
 
-**The offline path is a first-class requirement, not a contingency.** By H24 the whole system must
-run from `docker-compose up` with a seeded database and no internet. Conference Wi-Fi has ended
-more hackathon demos than bugs have.
+**The offline path is a first-class requirement, not a contingency** — see §3.10.
+
+### 3.10 Offline fixture & replay system
+
+**Ratified as a MUST-have feature (M14) with an owner (Dev B) and a deadline (H12).** Not a
+fallback, not a rehearsal aid — a component of the product with its own acceptance criteria.
+
+#### What it is
+
+A committed, deterministic dataset plus the tooling to load, reset, and replay it, such that the
+entire happy path — registration → risk assessment → policy → monitoring → trigger → payout →
+audit — runs with **no live weather API and no internet**.
+
+```
+backend/seeds/
+├── reference/                  # crops, districts, products, grid cells
+├── weather/
+│   ├── coimbatore_11.0_76.9.json    # 35 years daily, ~12.8k records per cell
+│   ├── erode_11.3_77.7.json
+│   ├── tiruppur_11.1_77.3.json
+│   └── dindigul_10.4_77.9.json
+├── demo/                       # demo users, farms, plantings, pre-warmed assessment
+└── explanations/               # pre-generated Claude output, EN + TA
+```
+
+#### Provenance and honesty
+
+Fixtures are **real ERA5 data**, fetched once by Dev B and committed — not invented numbers. Each
+file carries a header recording source, fetch timestamp, coordinates, and date range. If the API
+turns out to be unreachable from every laptop (see R1), synthetic fixtures generated from published
+regional normals are the fallback, and they are labelled `"synthetic": true` in the header and in
+the UI. **We never present generated numbers as measurements.**
+
+#### Commands (in the `Makefile` from H2)
+
+| Command | Does |
+|---------|------|
+| `make seed` | Load reference + weather fixtures. Idempotent — twice gives the same database. |
+| `make seed-demo` | Add demo users, farms, policies, pre-warmed assessment and explanations |
+| `make demo-reset` | Delete `is_simulated` weather, reset policies/payouts to pre-demo state |
+| `make demo-offline` | Bring the full stack up with `WEATHER_PROVIDER=fixture` and **no network** |
+| `make refresh-fixtures` | Re-fetch from Open-Meteo and rewrite the JSON — the *only* command that touches the network |
+
+#### The provider interface
+
+One interface, three implementations, selected by `WEATHER_PROVIDER`:
+
+```
+WeatherProvider (protocol)
+├── OpenMeteoProvider   # live HTTP — used only by refresh-fixtures and scheduled ingest
+├── NasaPowerProvider   # live HTTP fallback
+└── FixtureProvider     # reads committed JSON — the default in dev, test, and demo
+```
+
+`FixtureProvider` is the **default in development and the default in the demo environment.** Live
+providers are opt-in. This inverts the usual arrangement deliberately: the offline path is the one
+that gets exercised hundreds of times during the build, so it is the one that works when it matters.
+
+#### Acceptance criteria (verified at H12, re-verified at H24)
+
+- [ ] `make demo-offline` brings the stack up with the network interface **disabled**
+- [ ] Full happy path completes end to end in that state
+- [ ] `make demo-reset` returns the database to an identical state, twice in a row
+- [ ] No code path outside `OpenMeteoProvider` / `NasaPowerProvider` makes an outbound HTTP call
+- [ ] Fixture headers record real provenance
 
 ## 4. Repository layout (proposed)
 
@@ -259,15 +370,23 @@ climate-shield/
 │   │   ├── schemas/             # Pydantic — THE CONTRACT       [A+B, hour 2]
 │   │   ├── api/v1/              # routers, one file per resource
 │   │   ├── services/
-│   │   │   ├── weather/         # ingest, cache, indices        [Dev B]
+│   │   │   ├── weather/         # providers, ingest, indices    [Dev B]
+│   │   │   │   ├── providers/   #   open_meteo · nasa_power · fixture
+│   │   │   │   └── indices.py   #   phase-wise index computation
 │   │   │   ├── risk/            # burn analysis, ML, pricing    [Dev B]
-│   │   │   ├── trigger/         # deterministic evaluator       [Dev B]
+│   │   │   ├── trigger/         # DETERMINISTIC — no AI imports [Dev B]
 │   │   │   ├── payout/          # state machine, ledger         [Dev B]
 │   │   │   └── explain/         # Claude narration              [Dev D]
 │   │   └── jobs/                # APScheduler tasks
 │   ├── alembic/                 # migrations                    [Dev A]
-│   ├── seeds/                   # crops, products, demo fixtures
+│   ├── seeds/                   # OFFLINE FIXTURES — see §3.10  [Dev B/D]
+│   │   ├── reference/           #   crops, districts, products
+│   │   ├── weather/             #   35 yrs daily, 4 districts, committed
+│   │   ├── demo/                #   demo users, farms, policies
+│   │   └── explanations/        #   pre-generated Claude output
 │   └── tests/
+│       ├── test_architecture.py #   FAILS BUILD if trigger imports AI
+│       └── test_indices.py      #   index-window arithmetic
 ├── frontend/
 │   ├── app/
 │   │   ├── (auth)/              # login, OTP                    [Dev C]

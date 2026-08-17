@@ -14,12 +14,13 @@ routinely block or throttle outbound traffic too.
 
 | | |
 |---|---|
-| **Mitigation** | Cache-first architecture. Weather is a batch ingestion source; no read path calls upstream. Backfill starts at **H2**. |
-| **Fallback 1** | NASA POWER as an independent secondary source, behind the same interface |
-| **Fallback 2** | **Committed seed fixtures** — JSON weather data for the 4 demo districts in the repo, loaded by `make seed`. The demo runs from Git alone. |
-| **Fallback 3** | Synthetic generator: fit a Gamma distribution to known regional normals, generate plausible 35-year series, label clearly as synthetic |
-| **Decision point** | If the backfill is not complete by **H8**, switch to fixtures immediately and continue |
-| **Verification** | At H24 the full demo must run **with the network cable unplugged.** Not "should" — must. |
+| **Primary control** | **Answered by a MUST-have feature, not a fallback.** M14 — the offline fixture system — makes `FixtureProvider` the *default* in dev, test, and demo. Committed 35-year JSON for 4 districts; the demo runs from Git alone. |
+| **Gate** | **Gate 1 at H0–H2:** every developer curls the archive API from their own laptop. Whichever machine succeeds becomes the fixture-generation box, and the JSON is committed *before any other code is written*. |
+| **Mitigation** | Cache-first architecture — weather is a batch ingestion source; no read path calls upstream |
+| **Fallback 1** | NASA POWER as an independent secondary source, behind the same `WeatherProvider` interface |
+| **Fallback 2** | Synthetic generator: fit a Gamma distribution to published regional normals, generate a 35-year series, **labelled `"synthetic": true` in the fixture header and in the UI.** We never present generated numbers as measurements. |
+| **Decision point** | No laptop reaches the API by **H4** → switch to synthetic fixtures. Moved earlier from H8 because everything downstream depends on the cache. |
+| **Verification** | **H12 first pass, H24 full pass:** the happy path runs with the network interface **disabled**. Not "should" — must, and it is a checkpoint gate. |
 
 ---
 
@@ -76,15 +77,17 @@ Four developers, one repo, thirty hours, sleep deprivation.
 
 ---
 
-### R6 · PostGIS / geospatial setup consumes hours — **severity: medium**
+### R6 · PostGIS / geospatial setup consumes hours — **severity: low (designed out)**
 
-Extensions, SRIDs, and GeoAlchemy types can silently eat an afternoon.
+Extensions, SRIDs, and GeoAlchemy types can silently eat an afternoon. **Ratified at sign-off: we do
+not start there.**
 
 | | |
 |---|---|
-| **Mitigation** | Supabase ships PostGIS pre-installed — the main reason it is preferred over self-hosted |
-| **Fallback** | **Plain `lat`/`lon` `NUMERIC` columns.** Grid-cell snapping is `round(lat/0.1)*0.1` — arithmetic, no extension. Nothing in the MVP requires a spatial join. |
-| **Decision point** | PostGIS not working by **H5** → drop to float columns and move on. Cost: essentially zero. |
+| **Resolution** | **PostGIS is no longer the default — plain `latitude`/`longitude` `NUMERIC(9,6)` columns are.** This risk is designed out rather than managed. |
+| **Why it works** | Grid snapping is `round(lat/0.1)*0.1`; district filtering is an indexed string; area is entered, not derived; distance, if ever needed, is Haversine in eight lines. **No MVP query performs a spatial operation.** |
+| **Upgrade path** | If polygon boundaries or radius search become genuinely necessary: `CREATE EXTENSION postgis;` plus a migration adding `GEOGRAPHY(POINT,4326)` backfilled from the existing columns. Lat/lon remains the source of truth. |
+| **Decision point** | Adopt PostGIS **only** if a MUST-have requires it *and* it costs under 30 minutes — never "while we're here, it might be useful later". |
 
 ---
 
@@ -106,7 +109,8 @@ At 2am someone will propose blockchain settlement, IoT sensors, or a native app.
 | | |
 |---|---|
 | **Mitigation** | Explicit **NON-GOALS** list ([02 §5](./02-mvp-scope.md)) agreed aloud at kickoff, so refusing later is not a personal argument but a decision already made |
-| **Rule** | Any addition must name **the feature it replaces** |
+| **Rule** | **Nothing outside the agreed MUST / SHOULD / NICE lists gets built without explicit project-owner approval.** Anyone may propose; only the owner authorises. Ratified at sign-off. |
+| **Rule** | Any addition must name **the feature it replaces** and who stops working on what |
 | **Hard stop** | No new MUST after H8. No new anything after H26. |
 | **Decision point** | If a MUST is at risk at H20, cut a SHOULD **immediately** — never compress rehearsal time |
 
@@ -165,19 +169,24 @@ Someone re-seeds, a number changes, and the narration no longer matches the scre
 
 | ID | Risk | Severity | Probability | Decide by |
 |----|------|----------|-------------|-----------|
-| R1 | Weather API unavailable | Critical | **Confirmed** | H8 |
+| R1 | Weather API unavailable | Critical → **controlled by M14** | **Confirmed** | **H4** |
 | R2 | Demo fails on stage | Critical | Medium | H26 |
 | R4 | Deployment fails | High | Medium | H22 |
 | R5 | Integration chaos | High | Medium | continuous |
 | R8 | Scope creep | High | **Near-certain** | H8 |
 | R3 | ML underperforms | Medium | Medium | H20 |
-| R6 | PostGIS overhead | Medium | Low | H5 |
+| R6 | PostGIS overhead | **Designed out** | n/a | resolved |
 | R7 | Auth rabbit hole | Medium | Low | H6 |
 | R9 | Date arithmetic bugs | Medium | Medium | continuous |
 | R11 | Demo data drift | Medium | Medium | H24 |
 | R12 | Exhaustion | Medium | High | H16 |
 | R10 | LLM failure | Low | Low | rehearsal |
 
-**The three that decide the outcome:** R1 is already real and the architecture answers it. R8 is
-near-certain and is answered by an agreement made at hour zero. R2 is answered only by rehearsal
-time — which is why the H26 freeze is defended more strictly than any feature.
+**The three that decide the outcome:** R1 is already real, and at sign-off it was promoted from a
+fallback plan to a MUST-have feature (M14) with an H12 gate — the strongest available answer. R8 is
+near-certain and is answered by an agreement made at hour zero plus a named approver. R2 is answered
+only by rehearsal time, which is why the H26 freeze is defended more strictly than any feature.
+
+Two risks were **closed** at sign-off rather than mitigated: **R6**, by making PostGIS optional, and
+the AI-in-the-money-path concern, by making the separation a build-failing test (**M15**). Designing
+a risk out beats managing it.

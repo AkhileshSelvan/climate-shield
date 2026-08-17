@@ -111,20 +111,40 @@ everything downstream needs the cache populated. Owns the only unit tests that a
 Works against the **generated API client** from hour 3, with MSW mocks until endpoints land. Never
 blocked waiting for Dev A.
 
-### Dev D — Visualisation, AI Layer, Admin & Demo
+### Dev D — AI/Risk Visualisation, Admin Simulation, Demo Systems & Documentation
 **Owns:** `frontend/app/(admin)`, `frontend/components/{ui,charts}`, `frontend/messages/`,
-`backend/app/services/explain/`
+`backend/app/services/explain/`, `backend/seeds/{demo,explanations}/`, `docs/`
 
-- Design system: shadcn setup, tokens, dark/light — done early, unblocks C
-- **Charts:** 35-year trigger-years bar chart, season rainfall tracker, forecast band, portfolio view
-- **Admin simulation console** — the on-stage control surface
-- **Claude explanation service** + caching + static fallbacks
-- **i18n:** Tamil/English catalogues and toggle
-- **Owns the demo:** script, seed narrative, rehearsals, backup video, pitch deck, statistic verification
+**This is a full technical workstream.** Dev D writes backend and frontend code throughout, and
+owns some of the most demo-critical software in the repository.
 
-> Assigning the deck and rehearsals to a developer — not to "whoever is free at hour 29" — is
-> deliberate. Hackathons are lost on presentation far more often than on code. This is a real
-> workstream with real hours, and it is protected.
+**Backend**
+- **Claude explanation service** — prompt construction, structured-payload contract, response
+  validation (rejects any number not present in the input), caching, static per-band fallbacks
+- **Async generation pipeline** so explanation never blocks a risk response
+- **Demo seed builders** — `make seed-demo`, the pre-warmed assessment, pre-generated explanations
+- Contributes the demo half of the fixture system with Dev B (M14)
+
+**Frontend**
+- **Design system:** shadcn setup, tokens, light/dark — done early, unblocks Dev C
+- **Risk visualisation:** 35-year trigger-years chart, season rainfall tracker vs threshold,
+  forecast band, analogue-year projection display, portfolio exposure view. *This is how the risk
+  engine becomes legible — the charts are the argument that the model is real.*
+- **Admin simulation console** — the on-stage control surface for M9
+- **i18n:** Tamil/English catalogues, toggle, locale-aware number and date formatting
+
+**Documentation & demo systems**
+- Keeps `docs/` current as decisions change; records approved scope amendments
+- `README.md` rewrite at H24, architecture diagram, screenshots
+- Demo script maintenance, rehearsal coordination, backup recording, statistic verification
+
+> Dev D is a developer, not a presenter who also codes. The demo-systems work — simulation console,
+> seed builders, pre-generated explanations, reset tooling — is engineering, and it is what makes
+> the 4:30 script executable at all. Documentation sits here because the person who builds the admin
+> console and the charts has the clearest view of how the whole system fits together.
+>
+> **Presenting is a separate decision made at H26**, and it goes to whoever is most rested and most
+> fluent — which may well be someone else.
 
 ### Shared responsibilities
 Everyone: seeds their own domain's fixtures, writes their own `.env.example` entries, keeps `main`
@@ -137,15 +157,39 @@ Assumes a **09:00 Friday** start. Adjust offsets to the actual schedule; keep th
 ### H0 – H2 · Foundation *(all four together, in one room)*
 The highest-leverage two hours of the entire event.
 
-- [ ] Scope frozen against [02](./02-mvp-scope.md). MUST list agreed out loud.
+- [ ] Scope frozen against [02](./02-mvp-scope.md). MUST list **and NON-GOALS** agreed out loud.
+- [ ] **Open-Meteo connectivity verified from all four laptops** — see the gate below
 - [ ] Repo scaffold: backend package, frontend app, `docker-compose.yml`, `Makefile`, CI
 - [ ] `.gitignore` Node entries added; `.env.example` created
 - [ ] **Pydantic schemas + OpenAPI contract written and merged** ← the unblocking artifact
-- [ ] Supabase project created; connection string shared
+- [ ] `WeatherProvider` protocol + `FixtureProvider` stub committed (M14 skeleton)
+- [ ] `tests/test_architecture.py` committed and wired into CI (M15) — **it passes trivially now,
+      which is exactly when to add it**
+- [ ] Supabase project created; connection string shared. **Do not enable PostGIS.**
 - [ ] `make dev` works on all four laptops — *verified, not assumed*
 - [ ] Branch protection, `CODEOWNERS`, checkpoint tags agreed
 
-**Exit gate:** four people can run the stack and generate a typed client. Do not proceed otherwise.
+#### Gate 1 — weather connectivity (must complete before H2)
+
+Every developer runs, on their own machine and network:
+
+```bash
+curl -sS -o /dev/null -w "%{http_code}\n" \
+  "https://archive-api.open-meteo.com/v1/archive?latitude=11.0&longitude=76.96\
+&start_date=2024-06-01&end_date=2024-06-05&daily=precipitation_sum&timezone=auto"
+```
+
+| Result | Action |
+|--------|--------|
+| `200` on ≥ 1 laptop | That laptop becomes the **fixture-generation machine**. Dev B fetches all 35 years for 4 districts there and **commits the JSON immediately** — before writing any other code. |
+| `200` on none | Retry on a phone hotspot. Still failing → switch to synthetic fixtures from published regional normals, labelled `"synthetic": true`. Decide by **H4**, not H8. |
+| Works now, fails at the venue | Irrelevant — fixtures are committed and `FixtureProvider` is the default. |
+
+**This gate exists because the assumption has already failed once:** all three weather hosts return
+403 from the cloud session used to write this plan. Verify before depending on it.
+
+**Exit gate:** four people can run the stack and generate a typed client; connectivity is a known
+quantity rather than an assumption. Do not proceed otherwise.
 
 ### H2 – H6 · Parallel foundations
 | Dev | Work |
@@ -160,13 +204,19 @@ The highest-leverage two hours of the entire event.
 ### H6 – H12 · Core domain
 | Dev | Work |
 |-----|------|
-| A | Farms, plantings, crops, products endpoints; seed data |
-| B | Phase-wise index computation; **burn analysis**; `POST /risk/assess` |
+| A | Farms, plantings, crops, products endpoints; reference seeds |
+| B | Phase-wise index computation; **burn analysis**; `POST /risk/assess`; **finish M14 fixture system** |
 | C | Farm registration wired to the real API; risk view |
-| D | Charts on real assessment data; Claude explanation service |
+| D | Risk charts on real assessment data; Claude explanation service; demo seed builders |
 
-**`checkpoint-2` at H12:** register a farm → receive a **real** risk score from real cached weather.
-This is the moment the project becomes real. If it slips, cut SHOULDs immediately.
+**`checkpoint-2` at H12 — two gates, both hard:**
+1. Register a farm → receive a **real** risk score from real cached weather. This is the moment the
+   project becomes real.
+2. **`make demo-offline` runs the stack with the network interface disabled**, and farm registration
+   through risk assessment completes in that state (M14 acceptance, first pass).
+
+If either slips, cut SHOULDs immediately. The offline gate is checked at H12 rather than H24
+precisely so that the fallback is exercised for eighteen hours before it is needed.
 
 ### H12 – H16 · Insurance mechanics
 | Dev | Work |
@@ -195,8 +245,10 @@ This is the moment the project becomes real. If it slips, cut SHOULDs immediatel
 
 ### H20 – H24 · Integration & first rehearsal
 - [ ] Everything deployed to public URLs
-- [ ] Demo data seeded; **Claude explanations pre-generated**
-- [ ] `make demo-reset` working and verified repeatable
+- [ ] Demo data seeded; **Claude explanations pre-generated and committed**
+- [ ] `make demo-reset` working and verified repeatable **twice in a row**
+- [ ] **M14 full acceptance:** the *complete* happy path — registration → assessment → policy →
+      monitor → simulate → trigger → payout → audit — runs with the **network interface disabled**
 - [ ] **Rehearsal #1, timed, end to end** — expect breakage; this is what the rehearsal is for
 - [ ] Fix what broke; re-run
 

@@ -105,7 +105,7 @@ Ordered by build dependency. Item *n* generally unblocks item *n+1*.
 |---|---------|--------------------|-------|
 | M1 | Phone + OTP auth (mock code `123456`), JWT, roles | Farmer logs in and reaches a session-scoped dashboard | A |
 | M2 | Farm registration — map pin, area, district; crop + sowing date | Farm and planting persisted, snapped to a grid cell | A + C |
-| M3 | Weather ingestion + cache: ≥30 yrs daily for ≥4 demo districts | `weather_observation` populated; API reads **only** from cache | B |
+| M3 | Weather ingestion + cache: ≥30 yrs daily for ≥4 demo districts | `weather_observation` populated; API reads **only** from cache; provider selected by `WEATHER_PROVIDER` | B |
 | M4 | Crop calendar + phase-wise index computation | Given planting + year → cumulative rainfall, CDD, heat index for each phase | B |
 | M5 | **Burn-analysis risk engine** → trigger probability, expected loss, risk band, pure + gross premium | `POST /risk/assess` returns a full, persisted assessment in < 3 s | B |
 | M6 | Products + quote → **policy issuance with frozen trigger definition** | Policy row carries an immutable `trigger_definition` snapshot | A |
@@ -116,11 +116,22 @@ Ordered by build dependency. Item *n* generally unblocks item *n+1*.
 | M11 | Alert / notification feed | Early-warning, trigger, and payout events visible to the farmer | C |
 | M12 | **Audit view** of an evaluation | Exact index values, data source, engine version, timestamp | C |
 | M13 | Deployed public URL **or** rehearsed offline `docker-compose` demo | The 4:30 script runs start to finish, twice, without intervention | A |
+| **M14** | **Offline fixture & replay system** — committed 35-yr weather, `FixtureProvider`, `make seed` / `demo-reset` / `demo-offline` | **The complete happy path runs with the network interface disabled.** Verified at H12, re-verified at H24 | **B** |
+| **M15** | **Architectural fitness test** — build fails if `services/trigger` or `services/payout` imports any AI module | The separation is enforced by CI, not by intention | **B** |
 
 **M9 deserves a note.** The simulation endpoint is not a hack bolted on at hour 28 — it is the
 mechanism by which a 90-day insurance event becomes a 20-second stage moment. It is designed in
 from the start, built by hour 16, and rehearsed. Treating it as a first-class MUST is the single
 most important scoping decision in this document.
+
+**M14 is the second.** Promoting the offline fixture system from a fallback to a MUST changes when
+it gets built — H12, not H26 — and that is the entire point. A fallback built under pressure at
+hour 26 has never been exercised; a default provider used hundreds of times during development
+works when the venue Wi-Fi does not. Making `FixtureProvider` the *default* rather than the
+*emergency* option is what makes the guarantee real.
+
+**M15 makes principle 6 checkable.** An invariant nobody can verify is a comment. This one is a
+failing build.
 
 ## 3. SHOULD HAVE — build after all MUSTs are green
 
@@ -164,9 +175,25 @@ using it is not defeat.
 
 ## 6. Scope discipline rules
 
+0. **Nothing outside the MUST / SHOULD / NICE lists above gets built without explicit approval from
+   the project owner.** This list is the agreed scope, ratified at sign-off. A good idea that is not
+   on it is a good idea for after the hackathon. Anyone may *propose* an addition; only the owner
+   can authorise one, and the proposal must state what it replaces and who stops working on what.
 1. **No new MUST after H8.** The list above is frozen at kickoff.
 2. **A SHOULD may only start when every MUST is merged to `main` and smoke-tested.**
 3. **Nothing new after H26 (demo freeze).** Bug fixes only, on `hotfix/*`.
 4. Any proposed addition must name **the feature it replaces**. Scope is a fixed-size container.
 5. If a MUST is at risk at H20, cut a SHOULD immediately — do not compress the rehearsal window.
    Rehearsal time is not slack; it is the deliverable.
+
+### Scope-change protocol
+
+| Step | Who |
+|------|-----|
+| Propose in the team channel, naming the feature it replaces and the hours it costs | Anyone |
+| Approve or decline | **Project owner only** |
+| Record in `docs/09` as an amendment if approved | Dev D |
+
+Rejecting a proposal under this protocol is not a judgement about the idea. Say "not this
+hackathon" and move on — the list of things we deliberately did not build is in §5, and it is a
+sign of discipline, not of limitation.

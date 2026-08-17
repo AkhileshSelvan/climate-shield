@@ -22,7 +22,7 @@ product reduces it or prices it.
 
 ### And where AI is explicitly barred
 
-> **The LLM never decides money.**
+> **No AI component may authorise a payout — not the LLM, not LightGBM, not any future model.**
 > Trigger evaluation is arithmetic: read cached observations, sum them over a day-offset window,
 > compare to a frozen threshold, look up a tier. No inference, no sampling, no temperature. Given
 > the same stored inputs, the answer is identical in 2026 and 2036.
@@ -30,7 +30,23 @@ product reduces it or prices it.
 > This is not conservatism — it is what makes the product an insurance contract rather than a
 > suggestion. An insurer that cannot reproduce its own settlement decision has no product. When a
 > judge asks "how do you stop the AI hallucinating a payout?", the answer is that the AI is not in
-> that path, and the architecture diagram shows it.
+> that path, the architecture diagram shows it, and **a test in CI fails the build if anyone
+> changes that.**
+
+### How the separation is enforced
+
+Policy without a mechanism is a comment. Four mechanisms, detailed in
+[01 §3.7](./01-architecture.md#enforced-separation-from-ai--mechanism-not-just-policy):
+
+1. `services/trigger/` and `services/payout/` import from `models/`, `schemas/`, and stdlib only
+2. **`tests/test_architecture.py` walks the import graph and fails the build** on any AI import —
+   MUST-have **M15**, and the one test that gates CI from hour one
+3. Payout rows are created by exactly one function, called from exactly one place. **There is no
+   `POST /payouts` endpoint.**
+4. LLM output is written only to `explanation_en` / `explanation_ta`; nothing reads them back
+
+**The acceptance test:** delete `services/risk/` and `services/explain/` entirely, and the trigger
+engine must still evaluate every policy correctly. If it cannot, the separation is broken.
 
 ## 2. Tiered engine — build order is the risk mitigation
 
@@ -47,6 +63,13 @@ graph LR
 Each tier ships independently and degrades gracefully to the one before. **Tier 1 requires zero
 training data and cannot fail to produce an answer.** If every ML component collapses at hour 20,
 the product is still complete and the demo still runs. This ordering is the whole risk strategy.
+
+> **Ratified at sign-off:** **Tier 1 burn analysis is the mandatory AI/risk component.**
+> Monte Carlo, the analogue-year projection, LightGBM threshold optimisation, and Claude
+> explanations are **optional enhancements** — SHOULD-haves, cut without debate if a MUST is at
+> risk. No demo beat and no MUST-have depends on Tiers 2–4. The demo script degrades cleanly:
+> without Tier 4 the explanation renders from a static per-band string; without Tier 2 the
+> early-warning banner is omitted; without Tier 3 the thresholds come from the product template.
 
 ---
 

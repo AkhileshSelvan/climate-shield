@@ -2,8 +2,9 @@
 
 AI-powered parametric climate risk and insurance platform for smallholder farmers.
 
-> **Status: planning. No application code has been written yet.**
-> The complete pre-implementation plan lives in **[`docs/`](./docs/README.md)**.
+> **Status: plan approved 2026-08-17. No application code has been written yet.**
+> The complete pre-implementation plan lives in **[`docs/`](./docs/README.md)**; the sign-off
+> decision log is in [`docs/09 §0`](./docs/09-assumptions-and-decisions.md).
 > This README is rewritten with setup instructions once implementation begins.
 
 **Hack for Impact 2026 — KCT** · Theme: *AI for Climate Resilience* · 30 hours · 4 developers
@@ -30,8 +31,10 @@ the economics work at this scale.
 | **Early warning** | Analogue-year projection + 16-day forecast — warns *before* the loss |
 | **Accessibility** | Claude renders the numbers into Tamil or English a farmer can act on |
 
-**AI does not decide payouts.** Trigger evaluation is deterministic, versioned, and replayable from
-stored inputs alone. An insurance settlement that cannot be reproduced is not a product.
+**No AI component authorises a payout** — not the LLM, not LightGBM, not any future model. Trigger
+evaluation is deterministic, versioned, and replayable from stored inputs alone. An insurance
+settlement that cannot be reproduced is not a product. The separation is enforced by an import-graph
+test that fails the build, not by convention.
 
 ## Planning documentation
 
@@ -51,8 +54,9 @@ stored inputs alone. An insurance settlement that cannot be reproduced is not a 
 ## Proposed stack
 
 Next.js 15 · TypeScript · Tailwind · Leaflet — FastAPI · Python 3.11 · SQLAlchemy —
-PostgreSQL 16 + PostGIS (Supabase) — pandas · scikit-learn · LightGBM — Open-Meteo (ERA5) ·
-NASA POWER — Claude — Vercel · Render
+PostgreSQL 16 on Supabase, **PostGIS optional** — pandas · scikit-learn · LightGBM —
+Open-Meteo (ERA5) · NASA POWER, **with committed offline fixtures as the default provider** —
+Claude — Vercel · Render
 
 See [ADR-002](./docs/09-assumptions-and-decisions.md#adr-002--python-backend-not-node) for why the
 backend is Python, and [§3 Open questions](./docs/09-assumptions-and-decisions.md#3-open-questions-for-the-project-owner)

@@ -35,11 +35,15 @@ the farmer *before* the loss, and it explains all of it in the farmer's own lang
 
 ## Three principles that constrain every decision below
 
-1. **The LLM never decides money.** Trigger evaluation is deterministic, versioned, and replayable.
-   Claude explains outcomes; it never produces them. Every payout must be reproducible from stored
-   inputs alone.
-2. **The demo runs with the network unplugged.** All weather data is cached in Postgres before the
-   demo. No live third-party call is on the critical path.
-3. **Ship the floor before the ceiling.** Every AI component has a deterministic fallback that is
-   built *first*. Burn analysis works with zero training data; the ML model is an enhancement layer
-   on top, never a dependency.
+1. **No AI component may authorise a payout.** Trigger evaluation is deterministic, versioned, and
+   replayable. Claude explains outcomes; it never produces them. Enforced by an import-graph test
+   that **fails the build** (MUST-have M15), not by good intentions.
+2. **The system runs with the network unplugged.** The offline fixture system is a MUST-have
+   feature (M14) with `FixtureProvider` as the *default* — not an emergency path. Gated at H12.
+3. **Ship the floor before the ceiling.** Tier 1 burn analysis is mandatory and needs zero training
+   data. Monte Carlo, LightGBM and Claude explanations are optional enhancements layered on top,
+   never dependencies.
+
+> **Status: approved 2026-08-17** with ten adjustments, all reflected below. The decision log is in
+> [09 §0](./09-assumptions-and-decisions.md#0-sign-off--ratified-2026-08-17). Implementation has not
+> started and begins only on instruction.

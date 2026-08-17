@@ -1,7 +1,14 @@
 # 03 — Database Design
 
-PostgreSQL 16 + PostGIS. All identifiers are `UUID` (`gen_random_uuid()`). All timestamps are
-`TIMESTAMPTZ` stored UTC. **All money is `NUMERIC(14,2)` — never `float`.**
+PostgreSQL 16. All identifiers are `UUID` (`gen_random_uuid()`). All timestamps are `TIMESTAMPTZ`
+stored UTC. **All money is `NUMERIC(14,2)` — never `float`.**
+
+> **PostGIS is optional and is not the starting point.** Farm location is stored as plain
+> `latitude` / `longitude` `NUMERIC(9,6)` columns. Nothing in the MVP needs a spatial type — grid
+> snapping is `round(lat/0.1)*0.1`, district filtering is an indexed string, and area is entered
+> rather than derived. Adopt PostGIS only if a concrete need appears *and* it costs under 30
+> minutes; the migration path is documented in
+> [ADR-013](./09-assumptions-and-decisions.md#adr-013--postgis-is-optional-plain-latlon-is-the-default).
 
 ## 1. Entity–relationship diagram
 
@@ -33,8 +40,8 @@ erDiagram
     FARM {
         uuid id PK
         uuid owner_id FK
-        geography location "POINT 4326"
-        geography boundary "POLYGON, nullable"
+        numeric latitude "NUMERIC(9,6)"
+        numeric longitude "NUMERIC(9,6)"
         numeric area_ha
         string district
         uuid grid_cell_id FK
@@ -132,8 +139,8 @@ Codes are hashed, TTL 5 minutes, max 5 attempts. Purged on consumption.
 
 ### 2.2 Farm & crop
 
-**`farm`** — `id`, `owner_id` → `user`, `name`, `location GEOGRAPHY(POINT,4326)` (**required**),
-`boundary GEOGRAPHY(POLYGON,4326)` (nullable), `area_ha NUMERIC(8,2)`, `village`, `district`,
+**`farm`** — `id`, `owner_id` → `user`, `name`, **`latitude NUMERIC(9,6)`**,
+**`longitude NUMERIC(9,6)`** (both **required**), `area_ha NUMERIC(8,2)`, `village`, `district`,
 `state`, `soil_type`, `irrigation_type` (`rainfed|canal|borewell|drip`), `grid_cell_id` → cell,
 `created_at`.
 
@@ -141,7 +148,15 @@ Codes are hashed, TTL 5 minutes, max 5 attempts. Purged on consumption.
   downstream weather lookup keys on the cell, never on the farm.**
 - `irrigation_type = rainfed` is a real risk feature — rainfed farms carry materially higher
   weather-index exposure.
-- Index: `GIST(location)`, `btree(owner_id)`, `btree(district)`.
+- Index: `btree(owner_id)`, `btree(district)`, `btree(grid_cell_id)`. No spatial index needed —
+  no query in the MVP does a spatial search.
+- `NUMERIC(9,6)` gives ~11 cm of precision, far beyond what an 11 km weather grid can use. It is
+  chosen for exactness rather than resolution: floats would make two identical pins compare unequal.
+- **Optional PostGIS upgrade path:** add `location GEOGRAPHY(POINT,4326)` in a later migration,
+  backfill with `ST_MakePoint(longitude, latitude)`, add `GIST(location)`. Nothing above needs to
+  change; the lat/lon columns can stay as the source of truth.
+- A polygon `boundary` column is deliberately **not** in the MVP. It is the one thing that would
+  genuinely justify PostGIS, and it is a NICE-TO-HAVE.
 
 **`crop`** — `id`, `name`, `variety`, `duration_days`, `water_requirement_mm`,
 `phases JSONB`, `is_active`.
@@ -316,7 +331,7 @@ Each of these is a considered trade, not an oversight.
 
 | Simplification | Trade-off accepted |
 |----------------|--------------------|
-| Farm boundary optional; point is authoritative | Area is typed rather than derived from a polygon. Point + area is sufficient for index insurance, and polygon drawing on mobile is a UX time sink. |
+| No farm boundary polygon; point + typed area is authoritative | Area is entered rather than derived. Sufficient for index insurance, and polygon drawing on mobile is a UX time sink. This is also what removes the only real reason to need PostGIS. |
 | No reinsurance / capital-pool modelling | Portfolio solvency is a SHOULD (S8), not schema |
 | Single currency (INR) | No FX table; correct for the target market |
 | No soft deletes | Nothing is deleted in 30 hours |

@@ -1,10 +1,30 @@
 # 09 — Assumptions & Architecture Decisions
 
+## 0. Sign-off — ratified 2026-08-17
+
+The plan was approved by the project owner with ten adjustments. All are now reflected throughout
+`docs/`. Items marked **changed** altered the plan; items marked **ratified** confirmed it.
+
+| # | Decision | Effect | Where |
+|---|----------|--------|-------|
+| 1 | **Ratified** — keep the modular monolith | No change | [ADR-001](#adr-001--modular-monolith-not-microservices) |
+| 2 | **Changed** — PostGIS is optional; start with plain lat/lon | Schema, architecture and R6 rewritten; PostGIS explicitly *not* installed at H0 | [ADR-013](#adr-013--postgis-is-optional-plain-latlon-is-the-default) · [03](./03-data-model.md) · [08 R6](./08-risks.md) |
+| 3 | **Changed** — offline/demo fixtures are first-class | New **MUST M14**, new architecture §3.10, `FixtureProvider` is the *default*, gated at H12 instead of H24 | [ADR-014](#adr-014--the-offline-fixture-system-is-a-must-have-feature-not-a-fallback) · [01 §3.10](./01-architecture.md#310-offline-fixture--replay-system) · [02 M14](./02-mvp-scope.md) |
+| 4 | **Changed** — verify Open-Meteo from dev laptops first | New **Gate 1** in H0–H2; fixture-generation machine named; decision moved H8 → H4 | [07 Gate 1](./07-execution-plan.md#gate-1--weather-connectivity-must-complete-before-h2) · A13 |
+| 5 | **Ratified** — Tier 1 burn analysis mandatory; Tiers 2–4 optional | Stated explicitly; demo degradation path documented per tier | [ADR-012](#adr-012--build-the-deterministic-floor-before-the-ml-ceiling) · [05 §2](./05-ai-ml-design.md) |
+| 6 | **Changed** — AI can never authorise a payout | Policy became mechanism: new **MUST M15**, an import-graph test that fails the build | [ADR-003](#adr-003--deterministic-trigger-engine--no-ml-no-llm-ever) · [01 §3.7](./01-architecture.md#enforced-separation-from-ai--mechanism-not-just-policy) |
+| 7 | **Changed** — Dev D is a technical developer | Role rewritten around AI/risk visualisation, admin simulation, demo systems and documentation; presenting decoupled and decided at H26 | [07 Dev D](./07-execution-plan.md#dev-d--airisk-visualisation-admin-simulation-demo-systems--documentation) |
+| 8 | **Ratified** — H26 demo freeze and the four-person structure stand | No change | [07](./07-execution-plan.md) |
+| 9 | **Changed** — no out-of-scope features without explicit approval | New scope-change protocol naming the owner as sole approver | [02 §6](./02-mvp-scope.md#6-scope-discipline-rules) |
+| 10 | **Ratified** — no implementation until instructed | No code written | — |
+
+---
+
+## 1. Assumptions
+
 The repository contained no specification, so this plan necessarily makes assumptions. Every one is
 listed here with its basis and its blast radius if wrong. **Please correct any that are wrong before
 implementation begins** — several are cheap to change now and expensive to change at hour 20.
-
-## 1. Assumptions
 
 ### Context
 
@@ -32,7 +52,7 @@ implementation begins** — several are cheap to change now and expensive to cha
 | # | Assumption | Basis | If wrong |
 |---|-----------|-------|----------|
 | A12 | Team is comfortable with **Python and TypeScript/React** | The mainstream hackathon stack; `.gitignore` is a Python template | **High** — if the team is stronger in Node or Java, change the backend now. Familiarity beats elegance at 30 hours. |
-| A13 | **Open-Meteo is reachable** from team laptops | Public keyless API — but **confirmed blocked from this session** | **High** — R1 fallbacks exist, but verify on a laptop in hour 1 |
+| A13 | **Open-Meteo is reachable** from team laptops | Public keyless API — but **confirmed blocked from this session** | **High** — now handled by **Gate 1** at H0–H2: every developer verifies from their own machine before any code depends on it. If no laptop reaches it by H4, synthetic fixtures are used and labelled as such. |
 | A14 | ~11 km reanalysis resolution is **acceptable for a prototype** | Only source with 35 years of consistent coverage | Medium — stated as a known limitation on stage |
 | A15 | **Anthropic API access is available** for explanations | Tier 4 assumption | Low — static fallback strings; the demo does not depend on it |
 | A16 | Free tiers (Supabase / Vercel / Render) suffice | Demo-scale data and traffic | Low |
@@ -51,6 +71,8 @@ implementation begins** — several are cheap to change now and expensive to cha
 ---
 
 ## 2. Architecture Decision Records
+
+*ADR-001 to ADR-012 were written pre-sign-off; ADR-013 and ADR-014 were added at sign-off. Amendments are marked inline.*
 
 ### ADR-001 · Modular monolith, not microservices
 **Decision:** one FastAPI application with clear internal service boundaries.
@@ -76,6 +98,14 @@ in that path means a payout cannot be explained or defended six months later. Th
 single clearest answer to the "is your AI trustworthy?" question — the AI is not in that path.
 **Trade-off:** none. Sophistication belongs in *pricing* and *warning*, not in settlement.
 **Status:** non-negotiable. Any proposal to relax this is a proposal to change the product.
+
+**Amended at sign-off (decision 6):** the rule is now enforced rather than merely stated, and it
+covers *every* AI component, not only the LLM — LightGBM and any future model included.
+`services/trigger/` and `services/payout/` import from `models/`, `schemas/`, and stdlib only;
+**`tests/test_architecture.py` walks the import graph and fails the build** on violation (MUST-have
+**M15**); payouts are created by exactly one function with no API route behind it; LLM output is
+confined to two explanation columns that nothing reads back. Acceptance test: delete
+`services/risk/` and `services/explain/` and the trigger engine must still evaluate correctly.
 
 ### ADR-004 · Cache-first weather; providers are batch sources only
 **Decision:** all weather reads serve from `weather_observation`. No request-time upstream calls.
@@ -142,6 +172,41 @@ information the demo needs. Stating this on stage is a credibility gain, not a g
 collapses at hour 20, the product is still complete. It is also genuinely the right method — it is
 what reinsurers use — so this is a strong baseline, not a placeholder.
 **Trade-off:** none. Each tier is independently valuable.
+**Ratified at sign-off (decision 5):** Tier 1 burn analysis is the **mandatory** AI/risk component.
+Monte Carlo, analogue-year projection, LightGBM threshold optimisation and Claude explanations are
+**optional enhancements**, cut without debate if a MUST is at risk. No MUST-have and no demo beat
+depends on Tiers 2–4.
+
+### ADR-013 · PostGIS is optional; plain lat/lon is the default
+**Decision (sign-off, decision 2):** farm location is `latitude` / `longitude` `NUMERIC(9,6)`.
+PostGIS is **not** installed at project start.
+**Why:** nothing in the MVP performs a spatial operation. Grid snapping is `round(lat/0.1)*0.1`,
+district filtering is an indexed string, and area is entered by the farmer rather than derived from
+a polygon. The extension would buy capability we have no requirement for, at the risk of an
+afternoon lost to SRIDs and GeoAlchemy typing — a bad trade at hour 3 of 30.
+**Why `NUMERIC` and not `float`:** exactness. Two identical map pins must compare equal, and
+`NUMERIC(9,6)` gives ~11 cm precision against an 11 km weather grid — far more than enough.
+**Trade-off:** no polygon boundaries, no radius search. Both are NICE-TO-HAVEs.
+**Upgrade path (deliberately kept cheap):** `CREATE EXTENSION postgis;` then a migration adding
+`GEOGRAPHY(POINT,4326)` backfilled via `ST_MakePoint(longitude, latitude)`, with lat/lon remaining
+the source of truth.
+**Adopt only if:** a MUST-have requires it *and* it costs under 30 minutes.
+
+### ADR-014 · The offline fixture system is a MUST-have feature, not a fallback
+**Decision (sign-off, decision 3):** committed 35-year weather fixtures plus `FixtureProvider`,
+`make seed` / `demo-reset` / `demo-offline`, gated at **H12** and re-verified at **H24**. Tracked as
+MUST-have **M14**.
+**Why the promotion matters:** a fallback built under pressure at hour 26 has never been exercised.
+By making `FixtureProvider` the **default** provider in development, test, and demo — with live
+providers opt-in — the offline path is run hundreds of times during the build. That is the only
+version of this guarantee that actually holds when the venue Wi-Fi fails.
+**Reinforced by evidence:** all three weather hosts are already blocked from the environment where
+this plan was written. The assumption has failed once before anyone wrote a line of code.
+**Honesty constraint:** fixtures are real ERA5 data with provenance headers. If synthetic data is
+ever substituted, it is labelled `"synthetic": true` in the header and surfaced in the UI. We never
+present generated numbers as measurements.
+**Trade-off:** one interface and three implementations instead of one HTTP client — perhaps two
+hours. It buys the single most likely demo failure mode being eliminated.
 
 ---
 
@@ -156,5 +221,5 @@ Answers to Q1–Q3 could change the plan materially and are worth resolving befo
 | **Q3** | Any **hackathon-mandated stack, sponsor tooling, or required integration**? | Sponsor tracks often carry required services and bonus points | Assume none |
 | Q4 | Is **Tamil** the right second language, or Hindi/Telugu/Kannada? | Seed catalogues and demo narration | Tamil |
 | Q5 | Is the demo **live-presented** or **pre-recorded**? | Changes how hard the H26 freeze is defended | Live, with a recorded backup |
-| Q6 | Confirm **4 developers for the full 30 hours**? | With 3, all SHOULDs are cut and roles C+D merge | 4 developers |
+| Q6 | Confirm **4 developers for the full 30 hours**? | With 3, all SHOULDs are cut and roles C+D merge. *Structure ratified at sign-off (decision 8); Dev D confirmed as a technical role (decision 7).* | 4 developers |
 | Q7 | Preferred deployment accounts (Vercel / Render / Supabase) already exist? | Signup friction during the event | Create at H0 |
