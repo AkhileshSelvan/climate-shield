@@ -189,7 +189,7 @@ The final demonstration should show:
 7. Calculate the payout.
 8. Explain the decision to the user.
 
-## Definition of Done
+## Demo & Submission Definition of Done
 
 A feature is considered complete only when:
 
