@@ -360,7 +360,7 @@ gracefully when its dependency is unavailable; it appears in the demo script **o
 marked out-of-demo; and it does not break `make demo-reset`.
 
 This is the *engineering* bar. Demo and submission readiness are defined in
-[`HACKATHON_EXECUTION_PLAN.md`](./HACKATHON_EXECUTION_PLAN.md#definition-of-done).
+[`HACKATHON_EXECUTION_PLAN.md`](./HACKATHON_EXECUTION_PLAN.md#demo--submission-definition-of-done).
 
 ## 5. Communication cadence
 
