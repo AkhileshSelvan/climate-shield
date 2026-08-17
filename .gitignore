@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+backend/venv/
+backend/climateshield.db
+backend/server.log
+backend/__pycache__/
+backend/**/__pycache__/
