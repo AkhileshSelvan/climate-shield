@@ -202,6 +202,11 @@ entirely and Tier 1 thresholds stand. **Tier 3 is never on the demo critical pat
 
 **Model:** `claude-sonnet-4-5`. **Role:** narration and translation. **Never** computation.
 
+> **Scope note.** This is the *product* calling an API at runtime to render numbers into Tamil or
+> English — an optional enhancement with a static fallback, owned by Akhilesh ([#4](https://github.com/AkhileshSelvan/climate-shield/issues/4)).
+> It carries no implication about which AI tools any developer uses to build ClimateShield; that is
+> a personal choice ([07](./07-execution-plan.md#ai-tooling-is-a-personal-choice-not-a-team-standard)).
+
 The accessibility case is real: a smallholder farmer in Pollachi facing an English PDF that says
 *"cumulative precipitation deficit below the 120 mm threshold during the 45–75 day phenological
 window"* has not been informed of anything. A policy that cannot be understood is not insurance.

@@ -57,7 +57,7 @@ Each is a deliberate, recorded choice — not drift.
 | Offline-capable demo | ✅ Verified | Full happy path passes with sockets blocked |
 | Shared PostgreSQL | ⚠️ Configured | `DATABASE_URL` + compose file ready; the team must actually point at one |
 | Tier-1 burn analysis mandatory | ⛔ Not started | Next major workstream |
-| ML / Claude optional | ✅ Holding | Nothing depends on them |
+| ML / Claude explanation optional | ✅ Holding | Nothing depends on them. *Product* runtime dependency only — not a developer-tooling requirement. |
 | Admin simulation MUST-HAVE | ✅ Built | `/simulate/*`, idempotent, with reset |
 
 ## 5. Test coverage

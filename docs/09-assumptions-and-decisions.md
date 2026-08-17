@@ -13,10 +13,17 @@ The plan was approved by the project owner with ten adjustments. All are now ref
 | 4 | **Changed** — verify Open-Meteo from dev laptops first | New **Gate 1** in H0–H2; fixture-generation machine named; decision moved H8 → H4 | [07 Gate 1](./07-execution-plan.md#gate-1--weather-connectivity-must-complete-before-h2) · A13 |
 | 5 | **Ratified** — Tier 1 burn analysis mandatory; Tiers 2–4 optional | Stated explicitly; demo degradation path documented per tier | [ADR-012](#adr-012--build-the-deterministic-floor-before-the-ml-ceiling) · [05 §2](./05-ai-ml-design.md) |
 | 6 | **Changed** — AI can never authorise a payout | Policy became mechanism: new **MUST M15**, an import-graph test that fails the build | [ADR-003](#adr-003--deterministic-trigger-engine--no-ml-no-llm-ever) · [01 §3.7](./01-architecture.md#enforced-separation-from-ai--mechanism-not-just-policy) |
-| 7 | **Changed** — Dev D is a technical developer | Role rewritten around AI/risk visualisation, admin simulation, demo systems and documentation; presenting decoupled and decided at H26 | [07 Dev D](./07-execution-plan.md#dev-d--airisk-visualisation-admin-simulation-demo-systems--documentation) |
+| 7 | **Changed** — the fourth role is a technical developer, not a presenter | Originally rewritten as "Dev D". **Superseded 2026-08-17** by the named-owner realignment: the workstream is now Kirishwaran ([#7](https://github.com/AkhileshSelvan/climate-shield/issues/7)) — data/research, policy engine, testing — with presentation secondary. | [07 §2](./07-execution-plan.md#2-four-person-work-split) |
 | 8 | **Ratified** — H26 demo freeze and the four-person structure stand | No change | [07](./07-execution-plan.md) |
 | 9 | **Changed** — no out-of-scope features without explicit approval | New scope-change protocol naming the owner as sole approver | [02 §6](./02-mvp-scope.md#6-scope-discipline-rules) |
 | 10 | **Ratified** — no implementation until instructed | No code written | — |
+
+### Amendments after sign-off
+
+| Date | Amendment | Effect |
+|------|-----------|--------|
+| 2026-08-17 | **Ownership moved to GitHub issues #4–#7** | Placeholder Dev A/B/C/D roles replaced by named owners; issues are the source of truth. `.github/CODEOWNERS` added. | 
+| 2026-08-17 | **AI tooling is a personal choice, not a team standard** | No teammate is required to use any particular AI assistant. Nothing in this plan assumes one, and no task may be written so it only works with a specific tool. Akhilesh works with Claude and ChatGPT; that is his workflow. See [07](./07-execution-plan.md#ai-tooling-is-a-personal-choice-not-a-team-standard). |
 
 ---
 

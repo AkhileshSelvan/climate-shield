@@ -187,6 +187,27 @@ its verification in the same pair of hands.
 Everyone: seeds their own domain's fixtures, keeps `main` green, works from their issue checklist,
 and announces changes to `backend/app/schemas.py` before merging.
 
+### AI tooling is a personal choice, not a team standard
+
+**No developer is required to use any particular AI assistant.** Bhagavathianu, Karthik and
+Kirishwaran each choose their own tools; nothing in this plan assumes otherwise, and no task should
+ever be written so that it only works with a specific assistant. Akhilesh happens to work with
+Claude and ChatGPT — that is his workflow, not a team requirement.
+
+What *is* shared is the output contract, and it is tool-agnostic by design:
+
+| Shared | Not shared |
+|--------|-----------|
+| The OpenAPI schema and generated client | How you write the code |
+| Conventional Commits, branch and PR conventions | Which editor or assistant you use |
+| Tests must pass; `main` stays green | Whether tests were hand-written or generated |
+| Issue checklists #4–#7 | Your local setup |
+
+> **Do not confuse the two senses of "Claude" in this repository.** The product calls the Claude API
+> at runtime for vernacular explanation — a **Tier-4 optional enhancement** owned by Akhilesh (#4)
+> and described in [05 §6](./05-ai-ml-design.md). That is a product dependency with a static
+> fallback. It says nothing about how any teammate writes code.
+
 ### Where the workstreams touch
 
 | Boundary | Rule |
