@@ -4,6 +4,16 @@
 >
 > **Schedule convention:** The plan uses relative hackathon days and working-session time blocks so it remains aligned with the organizer's official timetable. Calendar dates should be filled from the event's confirmed schedule rather than invented locally.
 
+> **Authority (D3).** This document is canonical for the **hackathon schedule**: Phase 0 and the
+> three-day structure, wall-clock work blocks, the Golden Demo, submission preparation, and the
+> schedule convention above.
+>
+> Engineering execution and governance — branching and PR workflow, CODEOWNERS, integration
+> checkpoints and gates, team ownership, AI-tooling policy, communication cadence and the
+> engineering Definition of Done — is owned by
+> [`07-execution-plan.md`](./07-execution-plan.md).
+> Product scope is owned by [`02-mvp-scope.md`](./02-mvp-scope.md).
+
 ## Team Ownership
 
 | Team member | Primary responsibility |
