@@ -61,8 +61,11 @@ class Farm(Base):
     id = Column(Integer, primary_key=True, index=True)
     farmer_name = Column(String, nullable=False)
     location = Column(String, nullable=False)
-    latitude = Column(Float, nullable=True)
-    longitude = Column(Float, nullable=True)
+    # NUMERIC(9, 6), matching weather_grid_cells: a coordinate must compare
+    # equal to itself after a database round-trip, or the same pin can snap to
+    # two different cells. Float cannot promise that.
+    latitude = Column(Numeric(9, 6), nullable=True)
+    longitude = Column(Numeric(9, 6), nullable=True)
     crop = Column(String, nullable=False)
     area_acres = Column(Float, nullable=False)
     crop_stage = Column(String, nullable=True)

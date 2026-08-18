@@ -16,9 +16,12 @@ app = FastAPI(
     version="0.2.0",
 )
 
-# Schema is created by Alembic in any real environment; this keeps a fresh
-# SQLite dev database usable without a migration step.
-Base.metadata.create_all(bind=engine)
+# Alembic owns the schema everywhere it can. Creating tables here against a
+# PostgreSQL database would leave them unstamped — no alembic_version row — so a
+# later `alembic upgrade head` fails trying to create tables that already exist.
+# SQLite is the quick-start and test path, so keep the convenience there only.
+if engine.dialect.name == "sqlite":
+    Base.metadata.create_all(bind=engine)
 
 API_PREFIX = "/api/v1"
 ROUTERS = (farms, weather, policies, triggers, payouts, simulate)

@@ -52,5 +52,6 @@ the farmer *before* the loss, and it explains all of it in the farmer's own lang
    never dependencies.
 
 > **Status: approved 2026-08-17** with ten adjustments, all reflected below. The decision log is in
-> [09 §0](./09-assumptions-and-decisions.md#0-sign-off--ratified-2026-08-17). Implementation has not
-> started and begins only on instruction.
+> [09 §0](./09-assumptions-and-decisions.md#0-sign-off--ratified-2026-08-17). Implementation has since
+> begun — documents 00–09 remain the approved plan, and
+> [document 10](./10-implementation-status.md) records what is actually built.

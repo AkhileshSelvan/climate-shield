@@ -207,3 +207,53 @@ def test_a_window_reaching_past_the_cache_refuses_to_settle(client, farm, no_net
     response = client.post(f"/api/v1/triggers/check/{policy['id']}")
     assert response.status_code == 409
     assert "11 of 31 days present" in response.json()["detail"]
+
+
+def test_snap_returns_storable_decimals():
+    """Coordinates must snap to the precision they are stored at."""
+    from decimal import Decimal
+
+    from app.services.weather import grid
+
+    lat, lon = grid.snap(11.02, 76.98)
+    assert isinstance(lat, Decimal) and isinstance(lon, Decimal)
+    assert (lat, lon) == (Decimal("11.000000"), Decimal("77.000000"))
+
+
+def test_a_stored_coordinate_still_finds_its_own_cell(client, db_session, farm):
+    """The round-trip that a float comparison can lose.
+
+    A farm's coordinates come back from the database as Decimal. Re-snapping
+    those stored values must find the cell the farm already points at, not miss
+    it and try to insert a duplicate.
+    """
+    from app import models
+    from app.services.weather import cache
+
+    stored = db_session.query(models.Farm).filter_by(id=farm["id"]).one()
+    cells_before = db_session.query(models.WeatherGridCell).count()
+
+    again = cache.get_or_create_cell(db_session, stored.latitude, stored.longitude)
+
+    assert again.id == stored.grid_cell_id
+    assert db_session.query(models.WeatherGridCell).count() == cells_before
+
+
+def test_two_pins_in_one_cell_share_a_single_grid_row(client, db_session):
+    """The point of the shared grid: neighbours reuse one weather row."""
+    from app import models
+
+    def make(name, lat, lon):
+        return client.post(
+            "/api/v1/farms/",
+            json={
+                "farmer_name": name, "location": "Pollachi", "latitude": lat,
+                "longitude": lon, "crop": "maize", "area_acres": 2.0,
+            },
+        ).json()
+
+    a = make("Murugan", 11.02, 76.98)
+    b = make("Selvi", 11.04, 76.96)
+
+    assert a["grid_cell_id"] == b["grid_cell_id"]
+    assert db_session.query(models.WeatherGridCell).count() == 1

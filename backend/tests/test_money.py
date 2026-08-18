@@ -18,7 +18,8 @@ def test_no_binary_float_error():
     assert calculate_payout(Decimal("0.30"), Decimal("1")) == Decimal("0.30")
     total = quantize_money("0.1") + quantize_money("0.2")
     assert total == Decimal("0.3")
-    assert float(Decimal("0.1") + Decimal("0.2")) != 0.1 + 0.2 or True
+    # Decimal lands on exactly 0.3; binary float overshoots to 0.30000000000000004.
+    assert float(Decimal("0.1") + Decimal("0.2")) != 0.1 + 0.2
 
 
 def test_float_input_does_not_smuggle_error():
