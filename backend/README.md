@@ -31,6 +31,16 @@ Any target that needs the virtualenv checks for it first and tells you what to r
 so a missing or differently-named venv fails with a clear message instead of
 `No such file or directory`.
 
+### Running uvicorn directly
+
+`make dev` runs uvicorn from inside `backend/`, and that working directory is what
+puts `app` on the import path. The raw command from the repository root fails with
+`ModuleNotFoundError: No module named 'app'`, so run it from `backend/`:
+
+```bash
+cd backend && ../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+```
+
 ## The one thing to understand
 
 **Trigger evaluation never touches the network.** Weather providers are
