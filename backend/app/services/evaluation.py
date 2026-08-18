@@ -60,6 +60,43 @@ def _existing(db: Session, policy_id: int, evaluation_date: date) -> models.Trig
     )
 
 
+def _ensure_payout(
+    db: Session, trigger: models.Trigger, policy: models.Policy
+) -> models.Payout | None:
+    """Return the payout for a triggered evaluation, creating it if it is missing.
+
+    A trigger and its payout are committed separately, so a crash between the
+    two, or a concurrent request reading in the gap, can leave a triggered
+    evaluation with no payout. Every later call then takes the reuse path in
+    `evaluate_policy`, so without this repair a valid claim would stay unpaid
+    for good. Creating the payout is safe to retry: uq_payout_trigger allows
+    only one per trigger, and losing that race just means reading the winner.
+    """
+    if not trigger.triggered:
+        return None
+    if trigger.payout is not None:
+        return trigger.payout
+
+    payout = models.Payout(
+        trigger_id=trigger.id,
+        amount=calculate_payout(policy.coverage_amount),
+        status="initiated",
+    )
+    db.add(payout)
+    try:
+        db.commit()
+    except IntegrityError:
+        # A concurrent request created it first. Its row is the one that counts.
+        db.rollback()
+        return (
+            db.query(models.Payout)
+            .filter(models.Payout.trigger_id == trigger.id)
+            .first()
+        )
+    db.refresh(payout)
+    return payout
+
+
 def evaluate_policy(
     db: Session,
     policy_id: int,
@@ -82,7 +119,7 @@ def evaluate_policy(
     # Idempotency, fast path: already evaluated for this date.
     existing = _existing(db, policy_id, evaluation_date)
     if existing is not None:
-        return _serialise(existing, existing.payout, reused=True)
+        return _serialise(existing, _ensure_payout(db, existing, policy), reused=True)
 
     window_start = evaluation_date - timedelta(days=policy.window_days)
     window_end = evaluation_date
@@ -134,30 +171,10 @@ def evaluate_policy(
         winner = _existing(db, policy_id, evaluation_date)
         if winner is None:
             raise
-        return _serialise(winner, winner.payout, reused=True)
+        return _serialise(winner, _ensure_payout(db, winner, policy), reused=True)
     db.refresh(trigger)
 
-    payout = None
-    if triggered:
-        payout = models.Payout(
-            trigger_id=trigger.id,
-            amount=calculate_payout(policy.coverage_amount),
-            status="initiated",
-        )
-        db.add(payout)
-        try:
-            db.commit()
-        except IntegrityError:
-            db.rollback()
-            payout = (
-                db.query(models.Payout)
-                .filter(models.Payout.trigger_id == trigger.id)
-                .first()
-            )
-        else:
-            db.refresh(payout)
-
-    return _serialise(trigger, payout, reused=False)
+    return _serialise(trigger, _ensure_payout(db, trigger, policy), reused=False)
 
 
 def reset_policy(db: Session, policy_id: int) -> dict:

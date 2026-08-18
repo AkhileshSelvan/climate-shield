@@ -121,3 +121,76 @@ def test_reset_allows_a_repeat_rehearsal(client, db_session, drought_policy):
     again = client.post(f"/api/v1/simulate/drought/{policy_id}").json()
     assert again["idempotent_reuse"] is False
     assert len(_payouts_for(db_session, policy_id)) == 1
+
+
+def test_reuse_repairs_a_trigger_left_without_a_payout(client, db_session, drought_policy):
+    """A crash between the two commits must not strand a valid claim.
+
+    The trigger and its payout commit separately. If the process dies in the
+    gap, the evaluation exists and is triggered but has no payout — and every
+    later call takes the reuse path. Without a repair the claim never pays.
+    """
+    policy_id = drought_policy["id"]
+    eval_date = date(2026, 8, 11)
+
+    # Exactly the state a crash in the gap leaves behind.
+    db_session.add(
+        models.Trigger(
+            policy_id=policy_id, evaluation_date=eval_date,
+            observed_value=11.0, threshold_value=120.0, triggered=1,
+        )
+    )
+    db_session.commit()
+    assert _payouts_for(db_session, policy_id) == []
+
+    result = client.post(
+        f"/api/v1/simulate/drought/{policy_id}?evaluation_date={eval_date.isoformat()}"
+    ).json()
+
+    assert result["triggered"] is True
+    assert result["idempotent_reuse"] is True
+    assert "payout" in result, "reuse returned a triggered evaluation with no payout"
+    assert result["payout"]["amount"] == "21600.00"
+    assert len(_payouts_for(db_session, policy_id)) == 1
+
+
+def test_repairing_a_missing_payout_is_itself_idempotent(client, db_session, drought_policy):
+    """Repair must not become a second way to create payouts."""
+    policy_id = drought_policy["id"]
+    eval_date = date(2026, 8, 13)
+    db_session.add(
+        models.Trigger(
+            policy_id=policy_id, evaluation_date=eval_date,
+            observed_value=11.0, threshold_value=120.0, triggered=1,
+        )
+    )
+    db_session.commit()
+
+    url = f"/api/v1/simulate/drought/{policy_id}?evaluation_date={eval_date.isoformat()}"
+    results = [client.post(url).json() for _ in range(5)]
+
+    assert len({r["payout"]["payout_id"] for r in results}) == 1
+    assert len(_payouts_for(db_session, policy_id)) == 1
+
+
+def test_repair_does_not_invent_a_payout_for_an_untriggered_evaluation(
+    client, db_session, drought_policy
+):
+    """Only a breach pays. Repair must never manufacture a claim."""
+    policy_id = drought_policy["id"]
+    eval_date = date(2026, 8, 14)
+    db_session.add(
+        models.Trigger(
+            policy_id=policy_id, evaluation_date=eval_date,
+            observed_value=500.0, threshold_value=120.0, triggered=0,
+        )
+    )
+    db_session.commit()
+
+    result = client.post(
+        f"/api/v1/simulate/drought/{policy_id}?evaluation_date={eval_date.isoformat()}"
+    ).json()
+
+    assert result["triggered"] is False
+    assert "payout" not in result
+    assert _payouts_for(db_session, policy_id) == []
