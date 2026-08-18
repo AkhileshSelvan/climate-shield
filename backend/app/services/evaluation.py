@@ -133,12 +133,17 @@ def evaluate_policy(
         if not farm or farm.grid_cell_id is None:
             raise EvaluationError("Farm has no weather grid cell assigned", status_code=400)
         summary = cache.summarise_window(db, farm.grid_cell_id, window_start, window_end)
-        if summary["observations_used"] == 0:
-            # Refuse rather than treat missing data as zero rainfall, which
-            # would manufacture a drought that never happened.
+        expected_days = summary["expected_days"]
+        if summary["observations_used"] < expected_days:
+            # Settle on a complete window or not at all. A missing day is not a
+            # dry day: counting gaps as zero rainfall manufactures a drought
+            # that never happened, and the same gap hides a flood. Partial data
+            # must fail loudly rather than quietly decide someone's claim.
             raise EvaluationError(
-                "No cached weather observations for this window. "
-                "Ingest weather first (POST /api/v1/weather/ingest).",
+                f"Incomplete weather cache for {window_start.isoformat()} to "
+                f"{window_end.isoformat()}: {summary['observations_used']} of "
+                f"{expected_days} days present. Ingest the full window first "
+                "(POST /api/v1/weather/ingest).",
                 status_code=409,
             )
         observed = summary["total_rainfall_mm"]
