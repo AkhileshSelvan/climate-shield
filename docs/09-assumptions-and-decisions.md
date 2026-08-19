@@ -24,6 +24,7 @@ The plan was approved by the project owner with ten adjustments. All are now ref
 |------|-----------|--------|
 | 2026-08-17 | **Ownership moved to GitHub issues #4–#7** | Placeholder Dev A/B/C/D roles replaced by named owners; issues are the source of truth. `.github/CODEOWNERS` added. | 
 | 2026-08-17 | **AI tooling is a personal choice, not a team standard** | No teammate is required to use any particular AI assistant. Nothing in this plan assumes one, and no task may be written so it only works with a specific tool. Akhilesh works with Claude and ChatGPT; that is his workflow. See [07](./07-execution-plan.md#ai-tooling-is-a-personal-choice-not-a-team-standard). |
+| 2026-08-17 | **D3 — execution-plan authority split** | Both execution-plan documents are retained with separated authority. Hackathon schedule, phases, wall-clock blocks, Golden Demo and submission preparation → `HACKATHON_EXECUTION_PLAN.md`. Engineering execution and governance, Git/PR workflow, CODEOWNERS, gates and integration checkpoints, team ownership, AI-tooling policy and the engineering Definition of Done → [`07`](./07-execution-plan.md). Product scope → [`02`](./02-mvp-scope.md). The H0–H30 sequence in `07` is a relative engineering sequence, not the organizer's official event timetable. |
 
 ---
 

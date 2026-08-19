@@ -17,6 +17,30 @@ No Docker? Set `DATABASE_URL=sqlite:///./climateshield.db` in `backend/.env`.
 SQLite is supported for tests and quick local runs; **PostgreSQL is the
 deployment target.**
 
+### Virtualenv location
+
+`make install` creates the virtualenv at **`.venv` in the repository root**, and every
+`make` target uses it. If you already have one somewhere else, point make at it rather
+than recreating it:
+
+```bash
+make VENV=backend/venv test
+```
+
+Any target that needs the virtualenv checks for it first and tells you what to run,
+so a missing or differently-named venv fails with a clear message instead of
+`No such file or directory`.
+
+### Running uvicorn directly
+
+`make dev` runs uvicorn from inside `backend/`, and that working directory is what
+puts `app` on the import path. The raw command from the repository root fails with
+`ModuleNotFoundError: No module named 'app'`, so run it from `backend/`:
+
+```bash
+cd backend && ../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+```
+
 ## The one thing to understand
 
 **Trigger evaluation never touches the network.** Weather providers are

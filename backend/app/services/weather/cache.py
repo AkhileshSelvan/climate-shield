@@ -5,7 +5,9 @@ Reads never touch the network. Providers write here; evaluation reads here.
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app import models
@@ -15,19 +17,38 @@ from app.services.weather.providers import WeatherProvider, get_provider
 SIMULATED_SOURCE = "simulated"
 
 
-def get_or_create_cell(db: Session, latitude: float, longitude: float) -> models.WeatherGridCell:
-    lat, lon = grid.snap(latitude, longitude)
-    cell = (
+def _find_cell(db: Session, lat: Decimal, lon: Decimal) -> models.WeatherGridCell | None:
+    return (
         db.query(models.WeatherGridCell)
         .filter(models.WeatherGridCell.latitude == lat)
         .filter(models.WeatherGridCell.longitude == lon)
         .first()
     )
-    if cell is None:
-        cell = models.WeatherGridCell(latitude=lat, longitude=lon, label=f"{lat:.1f},{lon:.1f}")
-        db.add(cell)
+
+
+def get_or_create_cell(
+    db: Session, latitude: float | Decimal, longitude: float | Decimal
+) -> models.WeatherGridCell:
+    # snap() returns Decimal at the precision of the NUMERIC columns, so this
+    # lookup is an exact match rather than a float comparison that can miss and
+    # try to insert a duplicate of a cell that already exists.
+    lat, lon = grid.snap(latitude, longitude)
+    cell = _find_cell(db, lat, lon)
+    if cell is not None:
+        return cell
+
+    cell = models.WeatherGridCell(latitude=lat, longitude=lon, label=f"{lat:.1f},{lon:.1f}")
+    db.add(cell)
+    try:
         db.commit()
-        db.refresh(cell)
+    except IntegrityError:
+        # uq_grid_cell_latlon: a concurrent request created the same cell first.
+        db.rollback()
+        winner = _find_cell(db, lat, lon)
+        if winner is None:
+            raise
+        return winner
+    db.refresh(cell)
     return cell
 
 

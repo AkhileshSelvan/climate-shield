@@ -24,6 +24,11 @@
 | 09 | [Assumptions & Decisions](./09-assumptions-and-decisions.md) | Every assumption made, every ADR |
 | **10** | **[Implementation Status](./10-implementation-status.md)** | **As-built: what exists, deviations, enforcement status, remaining work** |
 | **11** | **[Risk Engine](./11-risk-engine.md)** | **Tier-1 burn analysis: algorithm, formula, API contract, assumptions, limitations** |
+| — | [Hackathon Execution Plan](./HACKATHON_EXECUTION_PLAN.md) | Schedule, phases, wall-clock blocks, Golden Demo, submission preparation |
+
+**Where authority sits (D3).** Hackathon schedule, phases, Golden Demo and submission →
+`HACKATHON_EXECUTION_PLAN.md` · engineering execution and governance, Git/PR workflow, CODEOWNERS,
+gates, team ownership, AI-tooling policy, engineering Definition of Done → `07` · product scope → `02`.
 
 ## The one-paragraph version
 
@@ -48,5 +53,6 @@ the farmer *before* the loss, and it explains all of it in the farmer's own lang
    never dependencies.
 
 > **Status: approved 2026-08-17** with ten adjustments, all reflected below. The decision log is in
-> [09 §0](./09-assumptions-and-decisions.md#0-sign-off--ratified-2026-08-17). Implementation has not
-> started and begins only on instruction.
+> [09 §0](./09-assumptions-and-decisions.md#0-sign-off--ratified-2026-08-17). Implementation has since
+> begun — documents 00–09 remain the approved plan, and
+> [document 10](./10-implementation-status.md) records what is actually built.

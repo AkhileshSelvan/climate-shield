@@ -75,10 +75,33 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true", help="fetch real ERA5 data")
     parser.add_argument("--years", type=int, default=2)
+    parser.add_argument(
+        "--start",
+        type=date.fromisoformat,
+        default=None,
+        help=(
+            "first day, ISO format (default: --years back from today). Pin this to "
+            "the existing start_date when extending fixtures: the series is seeded "
+            "per cell and walked forward, so an unchanged start reproduces every "
+            "committed value exactly and only appends new days."
+        ),
+    )
+    parser.add_argument(
+        "--forward-days",
+        type=int,
+        default=120,
+        help=(
+            "days of synthetic coverage past today. Evaluation requires a complete "
+            "window, so fixtures that stop on their generation date start refusing "
+            "to settle the day after. Ignored with --live: there are no real "
+            "observations for days that have not happened yet."
+        ),
+    )
     args = parser.parse_args()
 
-    end = date.today()
-    start = end - timedelta(days=365 * args.years)
+    today = date.today()
+    start = args.start or today - timedelta(days=365 * args.years)
+    end = today if args.live else today + timedelta(days=args.forward_days)
     FIXTURE_DIR.mkdir(parents=True, exist_ok=True)
 
     for cell in CELLS:
@@ -99,11 +122,14 @@ def main() -> None:
                     "label": cell["label"],
                     "source": source,
                     "synthetic": synthetic,
-                    "generated_on": date.today().isoformat(),
+                    "generated_on": today.isoformat(),
                     "start_date": start.isoformat(),
                     "end_date": end.isoformat(),
                     "note": (
                         "Synthetic series from published regional monsoon normals. "
+                        "Days after generated_on are placeholder values, not "
+                        "forecasts: they exist so an offline demo run on a later "
+                        "date still has a complete evaluation window. "
                         "Replace with real ERA5 via --live before the demo."
                         if synthetic
                         else "Real ERA5 daily precipitation via Open-Meteo archive."

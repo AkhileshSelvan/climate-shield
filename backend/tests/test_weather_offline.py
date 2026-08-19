@@ -111,7 +111,10 @@ def test_missing_cache_refuses_rather_than_assuming_zero_rain(client, drought_po
     """A gap read as zero rainfall would manufacture a drought. Refuse instead."""
     response = client.post(f"/api/v1/triggers/check/{drought_policy['id']}")
     assert response.status_code == 409
-    assert "No cached weather" in response.json()["detail"]
+    detail = response.json()["detail"]
+    assert "Incomplete weather cache" in detail
+    # The message must name the shortfall, so an operator knows what to ingest.
+    assert "0 of 31 days present" in detail
 
 
 def test_live_provider_failure_is_contained(monkeypatch):
@@ -144,3 +147,113 @@ def test_simulated_observations_take_precedence(client, db_session, farm, no_net
 
     assert cache.clear_simulated(db_session, cell_id) == 1
     assert cache.summarise_window(db_session, cell_id, today, today)["is_simulated"] is False
+
+
+def _drought_policy_for(client, farm_id, threshold_mm=9999.0):
+    return client.post(
+        "/api/v1/policies/",
+        json={
+            "farm_id": farm_id, "coverage_amount": "72000.00", "premium": "2169.00",
+            "trigger_type": "drought", "threshold_mm": threshold_mm, "window_days": 30,
+        },
+    ).json()
+
+
+def test_complete_window_settles_normally(client, farm, no_network):
+    """Positive control: the strict completeness check must not block good data."""
+    client.post("/api/v1/weather/ingest", json={"farm_id": farm["id"], "days": 60})
+    policy = _drought_policy_for(client, farm["id"])
+
+    response = client.post(f"/api/v1/triggers/check/{policy['id']}")
+    assert response.status_code == 200, response.text
+    # window_days=30 spans 31 inclusive days, and all of them are cached.
+    assert response.json()["observations_used"] == 31
+
+
+def test_a_gap_in_the_window_refuses_to_settle(client, db_session, farm, no_network):
+    """A missing day is not a dry day.
+
+    Dropping days from a drought window lowers the observed total, so partial
+    data can breach a threshold that complete data would not. That is a payout
+    manufactured by a gap in ingestion. Refuse instead of settling.
+    """
+    from app import models
+
+    client.post("/api/v1/weather/ingest", json={"farm_id": farm["id"], "days": 60})
+    policy = _drought_policy_for(client, farm["id"])
+
+    # Punch a single day out of the middle of the window.
+    missing = date.today() - timedelta(days=15)
+    deleted = (
+        db_session.query(models.WeatherObservation)
+        .filter(models.WeatherObservation.obs_date == missing)
+        .delete(synchronize_session=False)
+    )
+    db_session.commit()
+    assert deleted == 1
+
+    response = client.post(f"/api/v1/triggers/check/{policy['id']}")
+    assert response.status_code == 409
+    assert "30 of 31 days present" in response.json()["detail"]
+    # Nothing was settled on the partial window.
+    assert db_session.query(models.Trigger).filter_by(policy_id=policy["id"]).count() == 0
+
+
+def test_a_window_reaching_past_the_cache_refuses_to_settle(client, farm, no_network):
+    """The trailing-edge case: ingestion stops short of the evaluation date."""
+    client.post("/api/v1/weather/ingest", json={"farm_id": farm["id"], "days": 10})
+    policy = _drought_policy_for(client, farm["id"])
+
+    response = client.post(f"/api/v1/triggers/check/{policy['id']}")
+    assert response.status_code == 409
+    assert "11 of 31 days present" in response.json()["detail"]
+
+
+def test_snap_returns_storable_decimals():
+    """Coordinates must snap to the precision they are stored at."""
+    from decimal import Decimal
+
+    from app.services.weather import grid
+
+    lat, lon = grid.snap(11.02, 76.98)
+    assert isinstance(lat, Decimal) and isinstance(lon, Decimal)
+    assert (lat, lon) == (Decimal("11.000000"), Decimal("77.000000"))
+
+
+def test_a_stored_coordinate_still_finds_its_own_cell(client, db_session, farm):
+    """The round-trip that a float comparison can lose.
+
+    A farm's coordinates come back from the database as Decimal. Re-snapping
+    those stored values must find the cell the farm already points at, not miss
+    it and try to insert a duplicate.
+    """
+    from app import models
+    from app.services.weather import cache
+
+    stored = db_session.query(models.Farm).filter_by(id=farm["id"]).one()
+    cells_before = db_session.query(models.WeatherGridCell).count()
+
+    again = cache.get_or_create_cell(db_session, stored.latitude, stored.longitude)
+
+    assert again.id == stored.grid_cell_id
+    assert db_session.query(models.WeatherGridCell).count() == cells_before
+
+
+def test_two_pins_in_one_cell_share_a_single_grid_row(client, db_session):
+    """The point of the shared grid: neighbours reuse one weather row."""
+    from app import models
+
+    def make(name, lat, lon):
+        return client.post(
+            "/api/v1/farms/",
+            json={
+                "farmer_name": name, "location": "Pollachi", "latitude": lat,
+                "longitude": lon, "crop": "maize", "area_acres": 2.0,
+            },
+        ).json()
+
+    a = make("Murugan", 11.02, 76.98)
+    b = make("Selvi", 11.04, 76.96)
+
+    assert a["grid_cell_id"] == b["grid_cell_id"]
+    assert db_session.query(models.WeatherGridCell).count() == 1
