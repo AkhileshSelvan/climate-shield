@@ -107,3 +107,86 @@ def test_golden_demo_produces_the_expected_risk_result(db_session):
     assert result["confidence"] == "high"
     # Provenance must survive all the way to the caller.
     assert result["data_source"] == ["synthetic-regional-normals"]
+
+
+# --- Re-seeding an existing database -----------------------------------------
+#
+# Weather is upserted on every run, so a stale database refreshes its cache and
+# looks healthy. Policy terms are not, and a policy left on the old 120 mm
+# threshold would show SEVERE at 97.14% while the configuration here said
+# MEDIUM at 20.0%. Seeding must refuse rather than rewrite a frozen contract.
+
+
+def _seeded_farm_and_policy(db_session):
+    """Seed once, from empty. Returns the created farm and policy."""
+    return seed_demo.seed_demo_entities(db_session)
+
+
+def test_a_fresh_seed_creates_the_configured_demo_policy(db_session):
+    farm, policy = _seeded_farm_and_policy(db_session)
+
+    assert farm.farmer_name == seed_demo.DEMO_FARM["farmer_name"]
+    assert policy.farm_id == farm.id
+    for field, expected in seed_demo.DEMO_POLICY.items():
+        assert getattr(policy, field) == expected, field
+    assert seed_demo.policy_mismatches(policy) == []
+
+
+def test_re_seeding_a_matching_database_reuses_the_same_policy(db_session):
+    """The ordinary case: nothing changed, so nothing is created or refused."""
+    from app import models
+
+    _, first = _seeded_farm_and_policy(db_session)
+    _, second = seed_demo.seed_demo_entities(db_session)
+
+    assert second.id == first.id
+    assert db_session.query(models.Policy).count() == 1
+    assert second.threshold_mm == seed_demo.DEMO_THRESHOLD_MM
+
+
+def test_re_seeding_over_different_terms_refuses_and_says_why(db_session):
+    """The trap this guards: a database seeded before the threshold changed.
+
+    The old 120 mm policy must not survive silently, and must not be quietly
+    rewritten either — an issued contract's terms are frozen.
+    """
+    from app import models
+
+    _, policy = _seeded_farm_and_policy(db_session)
+
+    # Simulate a database seeded under the previous demo configuration.
+    policy.threshold_mm = 120.0
+    policy.window_days = 45
+    db_session.commit()
+
+    with pytest.raises(seed_demo.DemoSeedError) as exc_info:
+        seed_demo.seed_demo_entities(db_session)
+
+    message = str(exc_info.value)
+    # It must name what differs, or the operator cannot act on it.
+    assert "threshold_mm" in message and "120.0" in message and "30.0" in message
+    assert "window_days" in message and "45" in message
+    # And say what to do, including the reset that does *not* fix it.
+    assert "fresh" in message.lower()
+    assert "demo-reset" in message
+
+    # Nothing was mutated: refusing means refusing.
+    db_session.refresh(policy)
+    assert policy.threshold_mm == 120.0
+    assert policy.window_days == 45
+    assert db_session.query(models.Policy).count() == 1
+
+
+def test_a_coverage_change_is_caught_too(db_session):
+    """Not just the trigger terms — the insured amount matters as much."""
+    from decimal import Decimal
+
+    _, policy = _seeded_farm_and_policy(db_session)
+    policy.coverage_amount = Decimal("50000.00")
+    db_session.commit()
+
+    mismatches = seed_demo.policy_mismatches(policy)
+    assert [field for field, _, _ in mismatches] == ["coverage_amount"]
+
+    with pytest.raises(seed_demo.DemoSeedError, match="coverage_amount"):
+        seed_demo.seed_demo_entities(db_session)

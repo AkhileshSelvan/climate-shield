@@ -2,6 +2,11 @@
 
 Idempotent: running it twice produces the same database. Uses the fixture
 weather provider only, so it never needs a network.
+
+Idempotent is not the same as self-updating. Weather observations are upserted,
+so re-seeding refreshes them. Policy terms are not: an issued contract is never
+rewritten, so if the demo configuration here has changed since a database was
+seeded, this refuses rather than leaving the two disagreeing.
 """
 from __future__ import annotations
 
@@ -67,6 +72,10 @@ DEMO_POLICY = {
 }
 
 
+class DemoSeedError(RuntimeError):
+    """The database already holds a demo policy written on different terms."""
+
+
 def seed_weather(db, days: int = DEMO_LOOKBACK_DAYS) -> int:
     provider = FixtureProvider()
     end = date.today()
@@ -77,6 +86,51 @@ def seed_weather(db, days: int = DEMO_LOOKBACK_DAYS) -> int:
         total += result["observations_written"]
         print(f"  cell {lat:.1f},{lon:.1f}: {result['observations_written']} observations")
     return total
+
+
+def policy_mismatches(policy: models.Policy) -> list[tuple[str, object, object]]:
+    """Fields where an existing policy disagrees with the current DEMO_POLICY.
+
+    Returns (field, expected, found) in declaration order, empty when the two
+    agree. Decimal and float compare numerically, so a Money column read back
+    as 72000.0000 still matches Decimal("72000.00").
+    """
+    differences = []
+    for field, expected in DEMO_POLICY.items():
+        found = getattr(policy, field)
+        if found != expected:
+            differences.append((field, expected, found))
+    return differences
+
+
+def _stale_policy_message(
+    policy: models.Policy, mismatches: list[tuple[str, object, object]]
+) -> str:
+    """Say what differs and what to do about it.
+
+    Refusing is the point. Rewriting the terms would be the easy fix and the
+    wrong one: a policy's trigger terms are frozen at issue precisely so that a
+    contract cannot be changed underneath a farmer who already holds it. The
+    seeder is not entitled to an exemption just because the database is a demo.
+    """
+    rows = "\n".join(
+        f"      {field:<16} expected {expected!s:<12} found {found!s}"
+        for field, expected, found in mismatches
+    )
+    return (
+        f"Demo policy #{policy.id} already exists on different terms:\n\n"
+        f"{rows}\n\n"
+        "    Policy terms are frozen once issued, so seeding will not rewrite\n"
+        "    them. The demo would otherwise run on the stored terms while the\n"
+        "    configuration here claimed otherwise — a refreshed weather cache\n"
+        "    makes that look healthy while showing the wrong risk band.\n\n"
+        "    `make demo-reset` does not help: it clears evaluations, payouts\n"
+        "    and simulated weather, not policy terms. Start from a fresh\n"
+        "    database instead:\n\n"
+        "      PostgreSQL:  docker compose down -v && make db-up\n"
+        "      SQLite:      delete the database file\n"
+        "      then:        make migrate && make seed-demo"
+    )
 
 
 def seed_demo_entities(db) -> tuple[models.Farm, models.Policy]:
@@ -99,6 +153,9 @@ def seed_demo_entities(db) -> tuple[models.Farm, models.Policy]:
         db.refresh(policy)
         print(f"  policy #{policy.id}: {policy.trigger_type} below {policy.threshold_mm}mm")
     else:
+        mismatches = policy_mismatches(policy)
+        if mismatches:
+            raise DemoSeedError(_stale_policy_message(policy, mismatches))
         print(f"  policy #{policy.id}: already present")
     return farm, policy
 
@@ -143,7 +200,12 @@ def main() -> None:
         print(f"  {total} observations cached")
         if not args.weather_only:
             print("Seeding demo entities...")
-            seed_demo_entities(db)
+            try:
+                seed_demo_entities(db)
+            except DemoSeedError as exc:
+                # An actionable message beats a traceback: whoever runs this is
+                # setting up a demo, not debugging the seeder.
+                raise SystemExit(f"\nSeeding stopped.\n\n  {exc}\n") from None
         print("Done.")
     finally:
         db.close()
