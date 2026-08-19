@@ -15,15 +15,18 @@ import {
   MetricCard,
 } from "@/components/ui";
 import { createPolicy } from "@/lib/api";
-import { TRIGGER_TYPES } from "@/lib/types";
+import { TRIGGER_TYPES, DEMO_DEFAULTS } from "@/lib/types";
 
 export default function PolicyPage() {
   const router = useRouter();
   const { farm, riskAnalysis, policy, setPolicy, setCurrentStep } = useDemo();
 
-  const [coverageAmount, setCoverageAmount] = useState("50000");
-  const [triggerType, setTriggerType] = useState("drought");
-  const [thresholdMm, setThresholdMm] = useState("50");
+  // Pre-fill with demo defaults
+  const [coverageAmount, setCoverageAmount] = useState<string>(DEMO_DEFAULTS.coverage_amount);
+  const [premium, setPremium] = useState<string>(DEMO_DEFAULTS.premium);
+  const [triggerType, setTriggerType] = useState<string>(DEMO_DEFAULTS.trigger_type);
+  const [thresholdMm, setThresholdMm] = useState<string>(String(DEMO_DEFAULTS.threshold_mm));
+  const [windowDays, setWindowDays] = useState<string>(String(DEMO_DEFAULTS.window_days));
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,11 +53,15 @@ export default function PolicyPage() {
     setError(null);
 
     try {
+      // Backend PolicyCreate requires: farm_id, coverage_amount (Decimal),
+      // premium (Decimal), trigger_type, threshold_mm, window_days
       const result = await createPolicy({
         farm_id: farm.id,
-        coverage_amount: parseFloat(coverageAmount),
+        coverage_amount: coverageAmount,
+        premium: premium,
         trigger_type: triggerType,
         threshold_mm: parseFloat(thresholdMm),
+        window_days: parseInt(windowDays),
       });
 
       setPolicy(result);
@@ -140,7 +147,9 @@ export default function PolicyPage() {
                           ? "medium"
                           : riskAnalysis.risk_level === "HIGH"
                           ? "high"
-                          : "severe"
+                          : riskAnalysis.risk_level === "SEVERE"
+                          ? "severe"
+                          : "info"
                       }
                       size="sm"
                     >
@@ -160,6 +169,18 @@ export default function PolicyPage() {
                 step={1000}
                 required
                 helpText="Maximum payout amount in case of trigger activation"
+              />
+
+              <Input
+                id="premium-amount"
+                label="Premium (₹)"
+                value={premium}
+                onChange={setPremium}
+                type="number"
+                min={0}
+                step={1}
+                required
+                helpText="Premium amount for this policy"
               />
 
               <Select
@@ -188,6 +209,19 @@ export default function PolicyPage() {
                     ? "Trigger activates if rainfall drops BELOW this threshold"
                     : "Trigger activates if rainfall exceeds this threshold"
                 }
+              />
+
+              <Input
+                id="window-days"
+                label="Window (days)"
+                value={windowDays}
+                onChange={setWindowDays}
+                type="number"
+                min={1}
+                max={366}
+                step={1}
+                required
+                helpText="Number of days in the evaluation window"
               />
             </div>
 
@@ -238,16 +272,8 @@ export default function PolicyPage() {
                     />
                     <MetricCard
                       label="Premium"
-                      value={
-                        policy.premium
-                          ? formatCurrency(policy.premium)
-                          : "Pending"
-                      }
-                      subtitle={
-                        policy.premium
-                          ? "From backend calculation"
-                          : "Backend has not returned premium"
-                      }
+                      value={formatCurrency(policy.premium)}
+                      subtitle="From backend calculation"
                       variant="info"
                     />
                   </div>
@@ -275,6 +301,14 @@ export default function PolicyPage() {
                       </span>
                       <span className="text-sm font-semibold text-gray-200">
                         {policy.threshold_mm} mm
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-800/50">
+                      <span className="text-sm text-gray-400">
+                        Window
+                      </span>
+                      <span className="text-sm font-semibold text-gray-200">
+                        {policy.window_days} days
                       </span>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-gray-800/50">

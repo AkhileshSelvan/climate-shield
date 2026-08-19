@@ -15,6 +15,7 @@ import {
 } from "@/components/ui";
 import { RiskScoreRing } from "@/components/RiskScoreRing";
 import { analyzeRisk } from "@/lib/api";
+import { DEMO_DEFAULTS } from "@/lib/types";
 import type { RiskAnalysis } from "@/lib/types";
 
 const RISK_LEVEL_VARIANT = {
@@ -22,6 +23,7 @@ const RISK_LEVEL_VARIANT = {
   MEDIUM: "medium" as const,
   HIGH: "high" as const,
   SEVERE: "severe" as const,
+  UNKNOWN: "info" as const,
 };
 
 export default function RiskAnalysisPage() {
@@ -50,13 +52,13 @@ export default function RiskAnalysisPage() {
     setError(null);
 
     try {
+      // The risk API requires trigger_type, threshold_mm, window_days.
+      // Use demo defaults for the Golden Demo flow.
       const result = await analyzeRisk({
-        location: farm.location,
-        crop: farm.crop,
-        area_acres: farm.area_acres,
-        latitude: farm.latitude,
-        longitude: farm.longitude,
         farm_id: farm.id,
+        trigger_type: DEMO_DEFAULTS.trigger_type,
+        threshold_mm: DEMO_DEFAULTS.threshold_mm,
+        window_days: DEMO_DEFAULTS.window_days,
       });
 
       setRiskAnalysis(result);
@@ -79,6 +81,17 @@ export default function RiskAnalysisPage() {
 
   if (!farm) return null;
 
+  // Format trigger_definition dict into a human-readable string
+  function formatTriggerDef(def: Record<string, unknown>): string {
+    if (def.description) return String(def.description);
+    const parts: string[] = [];
+    if (def.trigger_type) parts.push(`Type: ${def.trigger_type}`);
+    if (def.threshold_mm) parts.push(`Threshold: ${def.threshold_mm}mm`);
+    if (def.window_days) parts.push(`Window: ${def.window_days} days`);
+    if (def.condition) parts.push(`Condition: ${def.condition}`);
+    return parts.join(" • ") || JSON.stringify(def);
+  }
+
   return (
     <div className="animate-fade-in">
       <StepIndicator currentStep="risk-analysis" />
@@ -94,7 +107,7 @@ export default function RiskAnalysisPage() {
               {farm.crop} farm in {farm.location} • {farm.area_acres} acres
             </p>
           </div>
-          {riskAnalysis?.is_synthetic && <SimulatedBadge />}
+          {riskAnalysis?.is_simulated && <SimulatedBadge />}
         </div>
 
         {/* Loading state */}
@@ -120,8 +133,8 @@ export default function RiskAnalysisPage() {
                 {/* Score Ring */}
                 <div className="flex-shrink-0">
                   <RiskScoreRing
-                    score={riskAnalysis.risk_score}
-                    level={riskAnalysis.risk_level}
+                    score={riskAnalysis.risk_score ?? 0}
+                    level={riskAnalysis.risk_level === "UNKNOWN" ? "LOW" : riskAnalysis.risk_level}
                   />
                 </div>
 
@@ -134,21 +147,19 @@ export default function RiskAnalysisPage() {
                     >
                       {riskAnalysis.risk_level} RISK
                     </Badge>
-                    {riskAnalysis.confidence != null && (
-                      <Badge variant="info" size="sm">
-                        {Math.round(riskAnalysis.confidence * 100)}% confidence
-                      </Badge>
-                    )}
+                    <Badge variant="info" size="sm">
+                      {riskAnalysis.confidence} confidence
+                    </Badge>
                   </div>
 
-                  {/* Why this risk */}
-                  {riskAnalysis.explanation && (
+                  {/* Why this risk — risk_level_meaning */}
+                  {riskAnalysis.risk_level_meaning && (
                     <div className="bg-navy-800/50 rounded-xl p-4 border border-gray-800">
                       <p className="text-sm font-medium text-gray-300 mb-1">
                         Why this risk level?
                       </p>
                       <p className="text-sm text-gray-400 leading-relaxed">
-                        {riskAnalysis.explanation}
+                        {riskAnalysis.risk_level_meaning}
                       </p>
                     </div>
                   )}
@@ -160,17 +171,22 @@ export default function RiskAnalysisPage() {
                         Trigger Definition
                       </p>
                       <p className="text-sm text-gray-400">
-                        {riskAnalysis.trigger_definition}
+                        {formatTriggerDef(riskAnalysis.trigger_definition)}
                       </p>
                     </div>
                   )}
 
-                  {/* Data quality */}
-                  {riskAnalysis.data_quality && (
-                    <p className="text-xs text-gray-500">
-                      Data quality: {riskAnalysis.data_quality}
-                    </p>
-                  )}
+                  {/* Data quality & source */}
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="info" size="sm">
+                      Data: {riskAnalysis.data_quality}
+                    </Badge>
+                    {riskAnalysis.data_source?.map((src, i) => (
+                      <Badge key={i} variant="info" size="sm">
+                        Source: {src}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             </Card>
@@ -186,27 +202,27 @@ export default function RiskAnalysisPage() {
                 />
               )}
 
-              {riskAnalysis.eligible_years != null && (
-                <MetricCard
-                  label="Eligible Years"
-                  value={riskAnalysis.eligible_years}
-                  subtitle="Years of data analyzed"
-                  variant="info"
-                />
-              )}
+              <MetricCard
+                label="Eligible Years"
+                value={riskAnalysis.eligible_years}
+                subtitle={`of ${riskAnalysis.historical_years} historical`}
+                variant="info"
+              />
 
-              {riskAnalysis.triggered_years != null && (
-                <MetricCard
-                  label="Triggered Years"
-                  value={riskAnalysis.triggered_years}
-                  subtitle="Years trigger was breached"
-                  variant="danger"
-                />
-              )}
+              <MetricCard
+                label="Triggered Years"
+                value={riskAnalysis.triggered_years}
+                subtitle={
+                  riskAnalysis.triggered_year_labels?.length
+                    ? riskAnalysis.triggered_year_labels.join(", ")
+                    : "No triggers"
+                }
+                variant="danger"
+              />
 
               <MetricCard
                 label="Risk Score"
-                value={`${riskAnalysis.risk_score}/100`}
+                value={`${riskAnalysis.risk_score ?? "—"}/100`}
                 subtitle={`${riskAnalysis.risk_level} severity`}
                 variant={
                   riskAnalysis.risk_level === "SEVERE"
@@ -220,25 +236,29 @@ export default function RiskAnalysisPage() {
               />
             </div>
 
-            {/* Recommendations */}
-            {riskAnalysis.recommendations &&
-              riskAnalysis.recommendations.length > 0 && (
-                <Card>
-                  <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">
-                    Recommendations
-                  </h3>
-                  <ul className="space-y-2">
-                    {(riskAnalysis.recommendations as string[]).map(
-                      (rec: string, i: number) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-400">
-                          <span className="text-climate-400 mt-0.5">•</span>
-                          {rec}
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </Card>
-              )}
+            {/* Risk factors */}
+            {riskAnalysis.factors && riskAnalysis.factors.length > 0 && (
+              <Card>
+                <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">
+                  Risk Factors
+                </h3>
+                <ul className="space-y-2">
+                  {riskAnalysis.factors.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-400">
+                      <span className={`mt-0.5 ${
+                        f.direction === "up" ? "text-danger-400" : "text-climate-400"
+                      }`}>
+                        {f.direction === "up" ? "▲" : "▼"}
+                      </span>
+                      <div>
+                        <span className="font-medium text-gray-300">{f.factor}:</span>{" "}
+                        {f.detail}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
 
             {/* Continue button */}
             <div className="flex justify-end pt-2">

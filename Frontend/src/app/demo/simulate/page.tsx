@@ -19,7 +19,6 @@ export default function SimulatePage() {
   const { farm, policy, simulationResult, setSimulationResult, setCurrentStep } =
     useDemo();
 
-  const [rainfallMm, setRainfallMm] = useState(20);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSimulated, setHasSimulated] = useState(false);
@@ -33,13 +32,6 @@ export default function SimulatePage() {
       router.push("/demo/policy");
       return;
     }
-
-    // Set default slider value based on trigger type
-    if (policy.trigger_type === "drought") {
-      setRainfallMm(Math.max(0, policy.threshold_mm - 20));
-    } else {
-      setRainfallMm(policy.threshold_mm + 50);
-    }
   }, [farm, policy, router]);
 
   async function handleSimulate() {
@@ -49,12 +41,14 @@ export default function SimulatePage() {
     setError(null);
 
     try {
+      // Backend uses hardcoded rainfall constants:
+      //   DROUGHT_RAINFALL_MM = 11.0
+      //   EXCESS_RAIN_RAINFALL_MM = 150.0
+      // No rainfall_mm in the request body.
       const simulateFn =
         policy.trigger_type === "drought" ? simulateDrought : simulateExcessRain;
 
-      const result = await simulateFn(policy.id, {
-        rainfall_mm: rainfallMm,
-      });
+      const result = await simulateFn(policy.id);
 
       setSimulationResult(result);
       setHasSimulated(true);
@@ -79,12 +73,12 @@ export default function SimulatePage() {
 
   const isDrought = policy.trigger_type === "drought";
   const threshold = policy.threshold_mm;
-  const sliderMax = isDrought ? threshold * 3 : threshold * 3;
 
-  // Calculate visual trigger status
+  // Backend hardcoded values
+  const simulatedRainfallMm = isDrought ? 11.0 : 150.0;
   const wouldTrigger = isDrought
-    ? rainfallMm < threshold
-    : rainfallMm > threshold;
+    ? simulatedRainfallMm < threshold
+    : simulatedRainfallMm > threshold;
 
   function formatCurrency(val: string | number | null): string {
     if (val == null) return "—";
@@ -140,60 +134,25 @@ export default function SimulatePage() {
                   Threshold: <strong>{threshold} mm</strong>
                 </span>
                 <span>
+                  Window: <strong>{policy.window_days} days</strong>
+                </span>
+                <span>
                   Coverage: <strong>{formatCurrency(policy.coverage_amount)}</strong>
                 </span>
               </div>
             </div>
 
-            {/* Rainfall slider */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-300">
-                  Simulated Rainfall
-                </label>
-                <span className="text-2xl font-bold tabular-nums text-gray-100">
-                  {rainfallMm} mm
-                </span>
-              </div>
-
-              <div className="relative">
-                <input
-                  id="rainfall-slider"
-                  type="range"
-                  min={0}
-                  max={sliderMax}
-                  step={1}
-                  value={rainfallMm}
-                  onChange={(e) => setRainfallMm(parseInt(e.target.value))}
-                  className="w-full h-3 rounded-full appearance-none cursor-pointer
-                             bg-navy-700
-                             [&::-webkit-slider-thumb]:appearance-none
-                             [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6
-                             [&::-webkit-slider-thumb]:rounded-full
-                             [&::-webkit-slider-thumb]:bg-climate-500
-                             [&::-webkit-slider-thumb]:shadow-[0_0_12px_rgba(16,185,129,0.4)]
-                             [&::-webkit-slider-thumb]:cursor-pointer
-                             [&::-webkit-slider-thumb]:transition-all
-                             [&::-webkit-slider-thumb]:hover:scale-110"
-                />
-
-                {/* Threshold marker */}
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 w-0.5 h-8 bg-danger-400/80"
-                  style={{
-                    left: `${(threshold / sliderMax) * 100}%`,
-                  }}
-                >
-                  <span className="absolute -top-7 left-1/2 -translate-x-1/2 text-xs text-danger-400 whitespace-nowrap font-medium">
-                    Threshold: {threshold}mm
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-between text-xs text-gray-600 mt-1">
-                <span>0 mm</span>
-                <span>{sliderMax} mm</span>
-              </div>
+            {/* Simulation info */}
+            <div className="bg-navy-800/50 rounded-xl p-4 border border-gray-800">
+              <p className="text-sm font-medium text-gray-300 mb-2">
+                Simulated Rainfall
+              </p>
+              <p className="text-3xl font-bold tabular-nums text-gray-100">
+                {simulatedRainfallMm} mm
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Backend hardcoded: {isDrought ? "11.0mm (drought)" : "150.0mm (excess rain)"}
+              </p>
             </div>
 
             {/* Trigger preview */}
@@ -230,13 +189,13 @@ export default function SimulatePage() {
                     }`}
                   >
                     {wouldTrigger
-                      ? "⚡ TRIGGER WOULD ACTIVATE"
+                      ? "⚡ TRIGGER WILL ACTIVATE"
                       : "✓ Within safe range"}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
                     {isDrought
-                      ? `${rainfallMm}mm ${rainfallMm < threshold ? "<" : "≥"} ${threshold}mm threshold`
-                      : `${rainfallMm}mm ${rainfallMm > threshold ? ">" : "≤"} ${threshold}mm threshold`}
+                      ? `${simulatedRainfallMm}mm ${simulatedRainfallMm < threshold ? "<" : "≥"} ${threshold}mm threshold`
+                      : `${simulatedRainfallMm}mm ${simulatedRainfallMm > threshold ? ">" : "≤"} ${threshold}mm threshold`}
                   </p>
                 </div>
               </div>
@@ -300,8 +259,8 @@ export default function SimulatePage() {
                 </h2>
 
                 <p className="text-gray-400 mt-2 text-sm">
-                  Observed: {simulationResult.observed_value}mm vs Threshold:{" "}
-                  {simulationResult.threshold_value}mm
+                  Observed: {simulationResult.observed_rainfall_mm}mm vs Threshold:{" "}
+                  {simulationResult.threshold_mm}mm
                 </p>
               </div>
 
@@ -311,7 +270,7 @@ export default function SimulatePage() {
                     Observed
                   </p>
                   <p className="text-xl font-bold text-gray-100 mt-1">
-                    {simulationResult.observed_value} mm
+                    {simulationResult.observed_rainfall_mm} mm
                   </p>
                 </div>
                 <div className="bg-navy-800/50 rounded-xl p-4 text-center">
@@ -319,18 +278,21 @@ export default function SimulatePage() {
                     Threshold
                   </p>
                   <p className="text-xl font-bold text-gray-100 mt-1">
-                    {simulationResult.threshold_value} mm
+                    {simulationResult.threshold_mm} mm
                   </p>
                 </div>
               </div>
 
-              {simulationResult.triggered && (
+              {simulationResult.triggered && simulationResult.payout && (
                 <div className="mt-6 text-center">
                   <p className="text-xs text-gray-500 uppercase tracking-wider">
-                    Estimated Payout
+                    Payout Amount
                   </p>
                   <p className="text-3xl font-bold text-climate-400 mt-1">
-                    {formatCurrency(simulationResult.payout_amount)}
+                    {formatCurrency(simulationResult.payout.amount)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {simulationResult.payout.currency} • Status: {simulationResult.payout.status}
                   </p>
                 </div>
               )}
@@ -340,11 +302,14 @@ export default function SimulatePage() {
                 <Badge variant="warning" size="sm">
                   Simulated Event
                 </Badge>
-                {simulationResult.severity_ratio != null && (
+                {simulationResult.idempotent_reuse && (
                   <Badge variant="info" size="sm">
-                    Severity: {(simulationResult.severity_ratio * 100).toFixed(0)}%
+                    Idempotent Reuse
                   </Badge>
                 )}
+                <Badge variant="info" size="sm">
+                  Engine: {simulationResult.engine_version}
+                </Badge>
               </div>
             </Card>
 

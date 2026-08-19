@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useDemo } from "@/context/DemoContext";
@@ -11,11 +11,17 @@ import {
   Button,
   MetricCard,
   SimulatedBadge,
+  Loader,
+  ErrorState,
 } from "@/components/ui";
+import { simulateDrought, simulateExcessRain } from "@/lib/api";
 
 export default function PayoutPage() {
   const router = useRouter();
-  const { farm, policy, simulationResult, resetDemo } = useDemo();
+  const { farm, policy, simulationResult, setSimulationResult, resetDemo } = useDemo();
+
+  const [retesting, setRetesting] = useState(false);
+  const [retestError, setRetestError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!farm) {
@@ -50,8 +56,30 @@ export default function PayoutPage() {
     router.push("/demo/farm-setup");
   }
 
+  // Re-run the same simulation to prove idempotency
+  async function handleRepeatEvaluation() {
+    if (!policy) return;
+
+    setRetesting(true);
+    setRetestError(null);
+
+    try {
+      const simulateFn =
+        policy.trigger_type === "drought" ? simulateDrought : simulateExcessRain;
+      const result = await simulateFn(policy.id);
+      setSimulationResult(result);
+    } catch (err) {
+      console.error("Repeat evaluation failed:", err);
+      setRetestError(
+        err instanceof Error ? err.message : "Repeat evaluation failed."
+      );
+    } finally {
+      setRetesting(false);
+    }
+  }
+
   const triggered = simulationResult.triggered;
-  const payoutAmount = simulationResult.payout_amount;
+  const payoutAmount = simulationResult.payout?.amount ?? null;
 
   return (
     <div className="animate-fade-in">
@@ -70,6 +98,18 @@ export default function PayoutPage() {
           </div>
           <SimulatedBadge />
         </div>
+
+        {retestError && (
+          <div className="mb-6">
+            <ErrorState
+              title="Repeat Evaluation Failed"
+              message={retestError}
+              onRetry={() => setRetestError(null)}
+            />
+          </div>
+        )}
+
+        {retesting && <Loader text="Re-running evaluation..." />}
 
         {/* ─── Main payout card ─── */}
         <Card
@@ -128,7 +168,7 @@ export default function PayoutPage() {
             {triggered ? "✓ TRIGGER CONFIRMED" : "NO TRIGGER"}
           </Badge>
 
-          {triggered && (
+          {triggered && payoutAmount && (
             <div className="mt-8">
               <p className="text-sm text-gray-500 uppercase tracking-widest">
                 Payout Amount
@@ -137,7 +177,8 @@ export default function PayoutPage() {
                 {formatCurrency(payoutAmount)}
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                Based on backend calculation • Coverage:{" "}
+                {simulationResult.payout?.currency} • Status:{" "}
+                {simulationResult.payout?.status} • Coverage:{" "}
                 {formatCurrency(policy.coverage_amount)}
               </p>
             </div>
@@ -153,6 +194,15 @@ export default function PayoutPage() {
               </p>
             </div>
           )}
+
+          {/* Idempotency badge */}
+          {simulationResult.idempotent_reuse && (
+            <div className="mt-4">
+              <Badge variant="info" size="sm">
+                ♻️ Idempotent Reuse — same result returned
+              </Badge>
+            </div>
+          )}
         </Card>
 
         {/* ─── Evaluation details ─── */}
@@ -164,12 +214,12 @@ export default function PayoutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <MetricCard
               label="Observed Rainfall"
-              value={`${simulationResult.observed_value} mm`}
+              value={`${simulationResult.observed_rainfall_mm} mm`}
               variant={triggered ? "danger" : "success"}
             />
             <MetricCard
               label="Threshold"
-              value={`${simulationResult.threshold_value} mm`}
+              value={`${simulationResult.threshold_mm} mm`}
               variant="info"
             />
             <MetricCard
@@ -189,30 +239,42 @@ export default function PayoutPage() {
               <span className="text-gray-500">Policy ID</span>
               <span className="text-gray-300 font-mono">#{simulationResult.policy_id}</span>
             </div>
-            {simulationResult.trigger_id != null && (
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Trigger ID</span>
-                <span className="text-gray-300 font-mono">#{simulationResult.trigger_id}</span>
-              </div>
-            )}
-            {simulationResult.payout_id != null && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">Trigger ID</span>
+              <span className="text-gray-300 font-mono">#{simulationResult.trigger_id}</span>
+            </div>
+            {simulationResult.payout?.payout_id != null && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Payout ID</span>
-                <span className="text-gray-300 font-mono">#{simulationResult.payout_id}</span>
+                <span className="text-gray-300 font-mono">#{simulationResult.payout.payout_id}</span>
               </div>
             )}
-            {simulationResult.severity_ratio != null && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">Evaluation Date</span>
+              <span className="text-gray-300">{simulationResult.evaluation_date}</span>
+            </div>
+            {simulationResult.window_start && simulationResult.window_end && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Severity Ratio</span>
+                <span className="text-gray-500">Window</span>
                 <span className="text-gray-300">
-                  {(simulationResult.severity_ratio * 100).toFixed(1)}%
+                  {simulationResult.window_start} → {simulationResult.window_end}
                 </span>
               </div>
             )}
             <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">Engine</span>
+              <span className="text-gray-300 font-mono text-xs">{simulationResult.engine_version}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">Data Source</span>
               <Badge variant="warning" size="sm">
-                Simulated
+                {simulationResult.data_source || "Simulated"}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">Idempotent Reuse</span>
+              <Badge variant={simulationResult.idempotent_reuse ? "info" : "success"} size="sm">
+                {simulationResult.idempotent_reuse ? "Yes (reused)" : "No (fresh)"}
               </Badge>
             </div>
           </div>
@@ -251,7 +313,7 @@ export default function PayoutPage() {
               <span className="text-gray-300">
                 <strong>Policy:</strong> Coverage{" "}
                 {formatCurrency(policy.coverage_amount)},{" "}
-                {policy.trigger_type} trigger at {policy.threshold_mm}mm
+                {policy.trigger_type} trigger at {policy.threshold_mm}mm / {policy.window_days} days
               </span>
             </div>
 
@@ -261,7 +323,7 @@ export default function PayoutPage() {
               </div>
               <span className="text-gray-300">
                 <strong>Event:</strong> Simulated{" "}
-                {simulationResult.observed_value}mm rainfall
+                {simulationResult.observed_rainfall_mm}mm rainfall
               </span>
             </div>
 
@@ -271,7 +333,7 @@ export default function PayoutPage() {
               </div>
               <span className="text-gray-300">
                 <strong>Payout:</strong>{" "}
-                {triggered
+                {triggered && payoutAmount
                   ? `${formatCurrency(payoutAmount)} settled`
                   : "No payout — threshold not breached"}
               </span>
@@ -287,27 +349,38 @@ export default function PayoutPage() {
           >
             ← Back to Home
           </Link>
-          <Button
-            id="restart-demo-btn"
-            onClick={handleRestart}
-            variant="secondary"
-            size="lg"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+          <div className="flex gap-3">
+            <Button
+              id="repeat-evaluation-btn"
+              onClick={handleRepeatEvaluation}
+              loading={retesting}
+              variant="secondary"
+              size="lg"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            Restart Demo
-          </Button>
+              ♻️ Repeat Evaluation
+            </Button>
+            <Button
+              id="restart-demo-btn"
+              onClick={handleRestart}
+              variant="secondary"
+              size="lg"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              Restart Demo
+            </Button>
+          </div>
         </div>
       </div>
     </div>

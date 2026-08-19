@@ -12,17 +12,22 @@ import {
   ErrorState,
 } from "@/components/ui";
 import { createFarm } from "@/lib/api";
-import { LOCATIONS, CROPS, CROP_STAGES } from "@/lib/types";
+import { LOCATIONS, CROPS, CROP_STAGES, DEMO_DEFAULTS } from "@/lib/types";
 
 export default function FarmSetupPage() {
   const router = useRouter();
   const { setFarm, setCurrentStep } = useDemo();
 
-  const [farmerName, setFarmerName] = useState("Rajan Kumar");
-  const [locationIdx, setLocationIdx] = useState("0");
-  const [crop, setCrop] = useState(CROPS[0] as string);
-  const [areaAcres, setAreaAcres] = useState("5");
-  const [cropStage, setCropStage] = useState(CROP_STAGES[1] as string);
+  // Pre-fill with demo defaults so the Golden Demo runs one-click
+  const [farmerName, setFarmerName] = useState<string>(DEMO_DEFAULTS.farmer_name);
+  const [locationIdx, setLocationIdx] = useState<string>(
+    String(DEMO_DEFAULTS.location_index)
+  );
+  const [crop, setCrop] = useState<string>(DEMO_DEFAULTS.crop);
+  const [areaAcres, setAreaAcres] = useState<string>(
+    String(DEMO_DEFAULTS.area_acres)
+  );
+  const [cropStage, setCropStage] = useState<string>(DEMO_DEFAULTS.crop_stage);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -145,7 +150,7 @@ export default function FarmSetupPage() {
               max={1000}
               step={0.1}
               required
-              placeholder="e.g. 5"
+              placeholder="e.g. 3"
             />
 
             <Select
