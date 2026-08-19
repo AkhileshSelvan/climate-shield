@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import farms, payouts, policies, risk, simulate, triggers, weather
 from app.core.config import get_settings
@@ -14,6 +15,14 @@ app = FastAPI(
         "weather cache, so the full path runs without network access."
     ),
     version="0.2.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Alembic owns the schema everywhere it can. Creating tables here against a
