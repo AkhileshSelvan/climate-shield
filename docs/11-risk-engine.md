@@ -217,6 +217,17 @@ whatever the dataset actually supports.
 - **Crop is carried but unused** in the calculation.
 - **Not actuarially validated.** This is a technical estimate, not a filed premium basis.
 - **Bundled fixtures are synthetic.** Every number is provisional until `make fixtures-live` runs.
+- **Partial windows are scored against the full threshold.** *(known limitation — open for policy
+  review)* A season passing the 80 % coverage gate has the sum of its *observed* days compared
+  against the whole-window threshold, so the missing days behave as zero rainfall. A 31-day window
+  at 4 mm/day reads as 100 mm over 25 observed days and breaches a 120 mm drought threshold, where
+  the same regime fully observed reads 124 mm and does not. The bias runs both ways: it inflates
+  drought frequency and suppresses excess-rain frequency. It does not affect the bundled demo,
+  whose fixtures are contiguous so every season is at 100 % coverage, but it will affect any cache
+  populated with real, gappy ingestion. Deliberately **not** changed in v1.0: the options are to
+  require complete coverage for evaluation, to normalise the observed sum to the window, or to
+  keep the current behaviour and disclose it. Each is a product decision about what a partially
+  observed season *means*, not a bug fix, and the choice is owned by the product owner.
 
 ## 12. Architecture
 

@@ -15,6 +15,7 @@ from app.services import trigger_engine
 from app.services.risk import burn_analysis as burn
 from app.services.risk.classification import classify
 from app.services.weather import cache, grid
+from app.services.weather.providers import is_synthetic_source
 
 DEFAULT_LOOKBACK_YEARS = 35
 
@@ -166,15 +167,32 @@ def _build_factors(result: burn.BurnAnalysisResult, level: str, meaning: str) ->
             }
         )
 
-    if any(s in ("fixture", "simulated") for s in result.data_source):
+    # Provenance is read from the stored source, never assumed from the fact
+    # that data came out of the cache. A fixture file refreshed by
+    # `make fixtures-live` holds real ERA5 measurements, and calling those
+    # synthetic would be exactly the kind of claim this engine must not make.
+    synthetic = sorted(s for s in result.data_source if is_synthetic_source(s))
+    measured = sorted(
+        s for s in result.data_source
+        if not is_synthetic_source(s) and s != cache.SIMULATED_SOURCE
+    )
+    if synthetic:
         factors.append(
             {
-                "factor": "fixture_data",
+                "factor": "synthetic_data",
                 "detail": (
-                    "Weather came from committed offline fixtures. The bundled fixtures are "
-                    "synthetic, generated from published regional normals — not measurements. "
+                    f"Weather came from generated series ({', '.join(synthetic)}) — "
+                    "modelled from published regional normals, not measurements. "
                     "Run `make fixtures-live` for real ERA5 data."
                 ),
+                "direction": "data_provenance",
+            }
+        )
+    elif measured:
+        factors.append(
+            {
+                "factor": "measured_data",
+                "detail": f"Weather came from measured observations ({', '.join(measured)}).",
                 "direction": "data_provenance",
             }
         )

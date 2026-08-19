@@ -262,11 +262,13 @@ def test_synthetic_data_flags_propagate_to_the_result(client, cached_farm):
         },
     ).json()
 
-    assert body["data_source"] == ["fixture"]
+    # The producer named in the fixture header, not the container it arrived in.
+    assert body["data_source"] == ["synthetic-regional-normals"]
     assert body["is_simulated"] is False  # cached fixture rows are not demo-injected
-    provenance = [f for f in body["factors"] if f["factor"] == "fixture_data"]
-    assert provenance, "fixture provenance must be surfaced as a factor"
-    assert "synthetic" in provenance[0]["detail"].lower()
+    provenance = [f for f in body["factors"] if f["factor"] == "synthetic_data"]
+    assert provenance, "synthetic provenance must be surfaced as a factor"
+    assert "not measurements" in provenance[0]["detail"]
+    assert not [f for f in body["factors"] if f["factor"] == "measured_data"]
 
 
 def test_simulated_observations_are_flagged(client, db_session, cached_farm):
@@ -411,3 +413,54 @@ def test_farm_pointing_at_a_missing_grid_cell_is_a_structured_error(client, db_s
 
     assert response.status_code == 409, response.text
     assert response.json()["detail"] == "Farm's weather grid cell 99999 does not exist"
+
+
+def test_live_era5_fixture_is_not_described_as_synthetic(client, db_session, farm, tmp_path):
+    """The `make fixtures-live` path must not have its data called synthetic.
+
+    A fixture file is a container. Regenerating it with --live puts real ERA5
+    measurements inside the same file a generated series occupied before, so
+    provenance has to come from the header rather than from the fact that the
+    data arrived via FixtureProvider.
+    """
+    import json
+    from datetime import date, timedelta
+
+    from app.services.weather import cache
+    from app.services.weather.providers import FixtureProvider
+
+    end = date.today()
+    start = end - timedelta(days=120)
+    rows, day = [], start
+    while day <= end:
+        rows.append({"date": day.isoformat(), "precipitation_mm": 2.0})
+        day += timedelta(days=1)
+    # Exactly the header `generate_fixtures.py --live` writes.
+    (tmp_path / "cell_11.0_77.0.json").write_text(
+        json.dumps({
+            "latitude": 11.0, "longitude": 77.0, "label": "Pollachi / Coimbatore",
+            "source": "open-meteo-era5", "synthetic": False,
+            "note": "Real ERA5 daily precipitation via Open-Meteo archive.",
+            "daily": rows,
+        })
+    )
+
+    cache.ingest(db_session, 11.0, 77.0, start, end,
+                 provider=FixtureProvider(fixture_dir=tmp_path))
+
+    body = client.post(
+        "/api/v1/risk/analyze",
+        json={
+            "farm_id": farm["id"], "trigger_type": "drought", "threshold_mm": 9999.0,
+            "window_days": 30, "season_end": end.isoformat(), "lookback_years": 1,
+        },
+    ).json()
+
+    assert body["data_source"] == ["open-meteo-era5"]
+    assert body["is_simulated"] is False
+    # Nothing anywhere in the response may call measured data synthetic.
+    assert not [f for f in body["factors"] if f["factor"] == "synthetic_data"]
+    measured = [f for f in body["factors"] if f["factor"] == "measured_data"]
+    assert measured, "measured provenance must be surfaced"
+    assert "open-meteo-era5" in measured[0]["detail"]
+    assert "synthetic" not in json.dumps(body).lower()

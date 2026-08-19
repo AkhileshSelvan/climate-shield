@@ -93,7 +93,8 @@ def test_full_happy_path_with_network_disabled(client, db_session, no_network):
     result = client.post(f"/api/v1/triggers/check/{policy['id']}").json()
     assert result["triggered"] is True
     assert result["observations_used"] > 0
-    assert result["data_source"] == "fixture"
+    # The producer named in the fixture header, not "fixture" the container.
+    assert result["data_source"] == "synthetic-regional-normals"
     assert result["payout"]["amount"] == "21600.00"
 
     payouts = client.get(f"/api/v1/payouts/?policy_id={policy['id']}").json()

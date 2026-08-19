@@ -19,6 +19,16 @@ class WeatherProviderError(RuntimeError):
     pass
 
 
+# Any source name beginning with this prefix is generated data, not measurement.
+# The convention lets provenance survive into the cache as a single string, so no
+# extra column is needed to tell a reader that a number was not observed.
+SYNTHETIC_SOURCE_PREFIX = "synthetic-"
+
+
+def is_synthetic_source(source: str) -> bool:
+    return source.startswith(SYNTHETIC_SOURCE_PREFIX)
+
+
 class WeatherProvider(Protocol):
     """Returns [{"date": "YYYY-MM-DD", "precipitation_mm": float}, ...]."""
 
@@ -27,6 +37,16 @@ class WeatherProvider(Protocol):
     def fetch_daily_precipitation(
         self, latitude: float, longitude: float, start: date, end: date
     ) -> list[dict]: ...
+
+    def source_for(self, latitude: float, longitude: float) -> str:
+        """The provenance to record for data this provider is about to return.
+
+        Usually the provider's own name. FixtureProvider is the exception: a
+        fixture file is a container, and what matters is who produced what is
+        inside it — regenerating with `--live` puts real ERA5 measurements in
+        the same file a synthetic series occupied before.
+        """
+        ...
 
 
 class FixtureProvider:
@@ -61,6 +81,20 @@ class FixtureProvider:
         return [
             r for r in rows if start.isoformat() <= r["date"] <= end.isoformat()
         ]
+
+    def source_for(self, latitude: float, longitude: float) -> str:
+        """The producer named in the fixture header, not "fixture".
+
+        A file refreshed by `make fixtures-live` holds real ERA5 measurements.
+        Recording it as "fixture" would let the risk API describe measured
+        weather as synthetic, which is the opposite of the truth.
+        """
+        payload = self.load_cell(latitude, longitude)
+        source = payload.get("source")
+        if source:
+            return str(source)
+        # No header to trust: assume generated, which is the safe direction.
+        return f"{SYNTHETIC_SOURCE_PREFIX}unlabelled"
 
 
 class OpenMeteoProvider:
@@ -99,6 +133,10 @@ class OpenMeteoProvider:
             for d, v in zip(dates, values)
             if v is not None
         ]
+
+    def source_for(self, latitude: float, longitude: float) -> str:
+        """Fetched live, so the provider name is the provenance."""
+        return self.name
 
 
 _PROVIDERS = {
