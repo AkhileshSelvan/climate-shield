@@ -16,6 +16,15 @@ from app.services.weather.providers import FixtureProvider
 
 DEMO_CELLS = [(11.0, 77.0), (11.3, 77.7), (11.1, 77.3), (10.4, 77.9)]
 
+# How much history the demo loads into the weather cache.
+#
+# The risk engine reads the cache, not the fixture files, so this bounds how
+# many historical seasons a 35-year burn analysis can actually evaluate. At the
+# previous 120 days exactly one season was complete, and the engine correctly
+# reported SEVERE at 100% off a sample of one. Loading the full span the
+# fixtures cover gives all 35 seasons and moves data_quality to `sufficient`.
+DEMO_LOOKBACK_DAYS = 365 * 35
+
 DEMO_FARM = {
     "farmer_name": "Murugan",
     "location": "Pollachi, Coimbatore",
@@ -26,16 +35,39 @@ DEMO_FARM = {
     "crop_stage": "flowering",
 }
 
+# DEMO THRESHOLD — NOT AN AGRONOMIC RECOMMENDATION.
+#
+# 30 mm is a demo calibration chosen against the *synthetic* fixture series, so
+# that the Golden Demo exercises a realistic, non-degenerate risk band. It is
+# not derived from crop water requirements and it is not scientifically
+# validated. A real deployment would set this from published crop water
+# requirements and district rainfall normals.
+#
+# Why 30 mm, measured on the committed fixtures for this farm and window
+# (30-day window, 35 eligible seasons, totals ranging 15–137 mm, median 41 mm):
+#
+#     < 20 mm ->  1/35 =  2.86%  LOW      too rare to demonstrate a payout
+#     < 25 mm ->  3/35 =  8.57%  LOW
+#     < 30 mm ->  7/35 = 20.00%  MEDIUM   <- chosen
+#     < 35 mm -> 13/35 = 37.14%  HIGH
+#     < 40 mm -> 17/35 = 48.57%  SEVERE
+#     <120 mm -> 34/35 = 97.14%  SEVERE   the previous value: fires nearly always
+#
+# 30 mm sits below the median of the distribution, so a breach represents a
+# genuinely unusual dry season rather than a typical one, and it yields roughly
+# one season in five — a frequency a parametric product could plausibly insure.
+DEMO_THRESHOLD_MM = 30.0
+
 DEMO_POLICY = {
     "coverage_amount": Decimal("72000.00"),
     "premium": Decimal("2169.00"),
     "trigger_type": "drought",
-    "threshold_mm": 120.0,
+    "threshold_mm": DEMO_THRESHOLD_MM,
     "window_days": 30,
 }
 
 
-def seed_weather(db, days: int = 120) -> int:
+def seed_weather(db, days: int = DEMO_LOOKBACK_DAYS) -> int:
     provider = FixtureProvider()
     end = date.today()
     start = end - timedelta(days=days)
@@ -87,7 +119,16 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--weather-only", action="store_true")
     parser.add_argument("--reset", action="store_true")
-    parser.add_argument("--days", type=int, default=120)
+    parser.add_argument(
+        "--days",
+        type=int,
+        default=DEMO_LOOKBACK_DAYS,
+        help=(
+            "days of history to load into the weather cache "
+            f"(default {DEMO_LOOKBACK_DAYS}, i.e. 35 years — the risk engine "
+            "reads the cache, so this bounds how many seasons it can evaluate)"
+        ),
+    )
     args = parser.parse_args()
 
     db = SessionLocal()
