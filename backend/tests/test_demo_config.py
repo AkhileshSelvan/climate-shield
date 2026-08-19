@@ -106,4 +106,4 @@ def test_golden_demo_produces_the_expected_risk_result(db_session):
     assert result["data_quality"] == "sufficient"
     assert result["confidence"] == "high"
     # Provenance must survive all the way to the caller.
-    assert result["data_source"] == ["fixture"]
+    assert result["data_source"] == ["synthetic-regional-normals"]
