@@ -42,6 +42,15 @@ def _resolve_cell(
             .filter(models.WeatherGridCell.id == farm.grid_cell_id)
             .first()
         )
+        if cell is None:
+            # The farm references a grid cell that is not there. PostgreSQL's
+            # foreign key prevents this, but SQLite does not enforce one by
+            # default, so fail with a structured error rather than an
+            # AttributeError on cell.id further down.
+            raise RiskAnalysisError(
+                f"Farm's weather grid cell {farm.grid_cell_id} does not exist",
+                status_code=409,
+            )
         return cell, farm
 
     if latitude is None or longitude is None:

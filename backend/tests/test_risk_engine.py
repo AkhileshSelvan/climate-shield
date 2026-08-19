@@ -387,3 +387,27 @@ def test_unknown_farm_is_404(client):
 def test_bands_endpoint_publishes_the_classification(client):
     body = client.get("/api/v1/risk/bands").json()
     assert [b["level"] for b in body["bands"]] == ["LOW", "MEDIUM", "HIGH", "SEVERE"]
+
+
+def test_farm_pointing_at_a_missing_grid_cell_is_a_structured_error(client, db_session, farm):
+    """A dangling grid_cell_id must not surface as an unhandled AttributeError.
+
+    PostgreSQL's foreign key rules this out; SQLite does not enforce one by
+    default, so the lookup has to be guarded rather than assumed.
+    """
+    from app import models
+
+    stored = db_session.query(models.Farm).filter_by(id=farm["id"]).one()
+    stored.grid_cell_id = 99999  # no such cell
+    db_session.commit()
+
+    response = client.post(
+        "/api/v1/risk/analyze",
+        json={
+            "farm_id": farm["id"], "trigger_type": "drought", "threshold_mm": 30.0,
+            "window_days": 30,
+        },
+    )
+
+    assert response.status_code == 409, response.text
+    assert response.json()["detail"] == "Farm's weather grid cell 99999 does not exist"
