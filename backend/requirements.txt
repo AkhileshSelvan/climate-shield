@@ -11,4 +11,4 @@ requests==2.32.5             # live weather ingestion only
 
 # dev / test
 pytest==9.0.1
-httpx==0.29.0                # FastAPI TestClient
+httpx==0.28.1                # FastAPI TestClient
