@@ -1,0 +1,14 @@
+# ClimateShield backend
+# Install:  python -m venv .venv && .venv/bin/pip install -r backend/requirements.txt
+fastapi==0.141.1
+uvicorn[standard]==0.38.0
+SQLAlchemy==2.0.52
+pydantic==2.12.4
+pydantic-settings==2.13.1
+alembic==1.17.1
+psycopg2-binary==2.9.12      # PostgreSQL driver (deployment target)
+requests==2.32.5             # live weather ingestion only
+
+# dev / test
+pytest==9.0.1
+httpx==0.29.0                # FastAPI TestClient

@@ -1,0 +1,29 @@
+# ClimateShield ownership — mirrors GitHub issues #4-#7, which are the source of truth.
+# Boundaries exist to minimise shared files. Coordinate before working outside yours.
+
+# Backend + database + APIs                          -> issue #5
+/backend/app/core/                        @Bhagavathianu
+/backend/app/models.py                    @Bhagavathianu
+/backend/app/api/                         @Bhagavathianu
+/backend/alembic/                         @Bhagavathianu
+/backend/requirements.txt                 @Bhagavathianu
+/docker-compose.yml                       @Bhagavathianu
+
+# Data, policy engine, fixtures, tests               -> issue #7
+/backend/app/services/weather/            @Kirishwaran
+/backend/app/services/trigger_engine.py   @Kirishwaran
+/backend/app/services/payout_engine.py    @Kirishwaran
+/backend/app/services/evaluation.py       @Kirishwaran
+/backend/seeds/                           @Kirishwaran
+/backend/tests/                           @Kirishwaran
+
+# AI / risk engine + architecture + docs             -> issue #4
+/backend/app/services/risk/               @AkhileshSelvan
+/backend/app/services/explain/            @AkhileshSelvan
+/docs/                                    @AkhileshSelvan
+
+# Frontend                                           -> issue #6
+/frontend/                                @Karthik
+
+# Shared API contract — change by PR only, announce in channel
+/backend/app/schemas.py                   @Bhagavathianu @AkhileshSelvan

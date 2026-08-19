@@ -1,0 +1,3421 @@
+{
+ "latitude": 11.3,
+ "longitude": 77.7,
+ "label": "Erode",
+ "source": "synthetic-regional-normals",
+ "synthetic": true,
+ "generated_on": "2026-08-18",
+ "start_date": "2024-08-17",
+ "end_date": "2026-12-16",
+ "note": "Synthetic series from published regional monsoon normals. Days after generated_on are placeholder values, not forecasts: they exist so an offline demo run on a later date still has a complete evaluation window. Replace with real ERA5 via --live before the demo.",
+ "daily": [
+  {
+   "date": "2024-08-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-19",
+   "precipitation_mm": 20.49
+  },
+  {
+   "date": "2024-08-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-08-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-04",
+   "precipitation_mm": 40.69
+  },
+  {
+   "date": "2024-09-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-07",
+   "precipitation_mm": 0.4
+  },
+  {
+   "date": "2024-09-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-12",
+   "precipitation_mm": 8.32
+  },
+  {
+   "date": "2024-09-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-23",
+   "precipitation_mm": 0.07
+  },
+  {
+   "date": "2024-09-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-26",
+   "precipitation_mm": 5.85
+  },
+  {
+   "date": "2024-09-27",
+   "precipitation_mm": 1.81
+  },
+  {
+   "date": "2024-09-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-09-30",
+   "precipitation_mm": 19.72
+  },
+  {
+   "date": "2024-10-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-04",
+   "precipitation_mm": 46.58
+  },
+  {
+   "date": "2024-10-05",
+   "precipitation_mm": 12.36
+  },
+  {
+   "date": "2024-10-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-10",
+   "precipitation_mm": 7.37
+  },
+  {
+   "date": "2024-10-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-13",
+   "precipitation_mm": 2.08
+  },
+  {
+   "date": "2024-10-14",
+   "precipitation_mm": 32.92
+  },
+  {
+   "date": "2024-10-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-16",
+   "precipitation_mm": 3.57
+  },
+  {
+   "date": "2024-10-17",
+   "precipitation_mm": 13.29
+  },
+  {
+   "date": "2024-10-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-19",
+   "precipitation_mm": 3.88
+  },
+  {
+   "date": "2024-10-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-21",
+   "precipitation_mm": 1.62
+  },
+  {
+   "date": "2024-10-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-24",
+   "precipitation_mm": 39.33
+  },
+  {
+   "date": "2024-10-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-27",
+   "precipitation_mm": 17.43
+  },
+  {
+   "date": "2024-10-28",
+   "precipitation_mm": 26.13
+  },
+  {
+   "date": "2024-10-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-10-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-03",
+   "precipitation_mm": 7.22
+  },
+  {
+   "date": "2024-11-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-08",
+   "precipitation_mm": 0.5
+  },
+  {
+   "date": "2024-11-09",
+   "precipitation_mm": 21.29
+  },
+  {
+   "date": "2024-11-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-17",
+   "precipitation_mm": 9.72
+  },
+  {
+   "date": "2024-11-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-20",
+   "precipitation_mm": 1.12
+  },
+  {
+   "date": "2024-11-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-25",
+   "precipitation_mm": 29.19
+  },
+  {
+   "date": "2024-11-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-28",
+   "precipitation_mm": 29.77
+  },
+  {
+   "date": "2024-11-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-11-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-04",
+   "precipitation_mm": 16.18
+  },
+  {
+   "date": "2024-12-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-13",
+   "precipitation_mm": 9.26
+  },
+  {
+   "date": "2024-12-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-16",
+   "precipitation_mm": 22.55
+  },
+  {
+   "date": "2024-12-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-22",
+   "precipitation_mm": 7.8
+  },
+  {
+   "date": "2024-12-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-24",
+   "precipitation_mm": 2.61
+  },
+  {
+   "date": "2024-12-25",
+   "precipitation_mm": 15.36
+  },
+  {
+   "date": "2024-12-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-27",
+   "precipitation_mm": 4.97
+  },
+  {
+   "date": "2024-12-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2024-12-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-04",
+   "precipitation_mm": 1.25
+  },
+  {
+   "date": "2025-01-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-08",
+   "precipitation_mm": 0.56
+  },
+  {
+   "date": "2025-01-09",
+   "precipitation_mm": 0.5
+  },
+  {
+   "date": "2025-01-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-11",
+   "precipitation_mm": 1.41
+  },
+  {
+   "date": "2025-01-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-14",
+   "precipitation_mm": 0.57
+  },
+  {
+   "date": "2025-01-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-01-31",
+   "precipitation_mm": 0.06
+  },
+  {
+   "date": "2025-02-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-05",
+   "precipitation_mm": 1.03
+  },
+  {
+   "date": "2025-02-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-10",
+   "precipitation_mm": 0.54
+  },
+  {
+   "date": "2025-02-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-15",
+   "precipitation_mm": 1.23
+  },
+  {
+   "date": "2025-02-16",
+   "precipitation_mm": 0.22
+  },
+  {
+   "date": "2025-02-17",
+   "precipitation_mm": 0.85
+  },
+  {
+   "date": "2025-02-18",
+   "precipitation_mm": 1.88
+  },
+  {
+   "date": "2025-02-19",
+   "precipitation_mm": 0.18
+  },
+  {
+   "date": "2025-02-20",
+   "precipitation_mm": 0.45
+  },
+  {
+   "date": "2025-02-21",
+   "precipitation_mm": 1.58
+  },
+  {
+   "date": "2025-02-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-26",
+   "precipitation_mm": 1.8
+  },
+  {
+   "date": "2025-02-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-02-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-03",
+   "precipitation_mm": 1.67
+  },
+  {
+   "date": "2025-03-04",
+   "precipitation_mm": 2.89
+  },
+  {
+   "date": "2025-03-05",
+   "precipitation_mm": 8.36
+  },
+  {
+   "date": "2025-03-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-07",
+   "precipitation_mm": 0.79
+  },
+  {
+   "date": "2025-03-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-14",
+   "precipitation_mm": 0.14
+  },
+  {
+   "date": "2025-03-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-19",
+   "precipitation_mm": 0.99
+  },
+  {
+   "date": "2025-03-20",
+   "precipitation_mm": 0.88
+  },
+  {
+   "date": "2025-03-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-03-29",
+   "precipitation_mm": 0.64
+  },
+  {
+   "date": "2025-03-30",
+   "precipitation_mm": 1.31
+  },
+  {
+   "date": "2025-03-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-03",
+   "precipitation_mm": 3.76
+  },
+  {
+   "date": "2025-04-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-12",
+   "precipitation_mm": 7.65
+  },
+  {
+   "date": "2025-04-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-16",
+   "precipitation_mm": 6.72
+  },
+  {
+   "date": "2025-04-17",
+   "precipitation_mm": 7.14
+  },
+  {
+   "date": "2025-04-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-26",
+   "precipitation_mm": 2.1
+  },
+  {
+   "date": "2025-04-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-04-30",
+   "precipitation_mm": 2.92
+  },
+  {
+   "date": "2025-05-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-08",
+   "precipitation_mm": 8.5
+  },
+  {
+   "date": "2025-05-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-11",
+   "precipitation_mm": 0.88
+  },
+  {
+   "date": "2025-05-12",
+   "precipitation_mm": 14.78
+  },
+  {
+   "date": "2025-05-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-14",
+   "precipitation_mm": 0.89
+  },
+  {
+   "date": "2025-05-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-22",
+   "precipitation_mm": 0.69
+  },
+  {
+   "date": "2025-05-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-25",
+   "precipitation_mm": 6.97
+  },
+  {
+   "date": "2025-05-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-05-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-02",
+   "precipitation_mm": 5.53
+  },
+  {
+   "date": "2025-06-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-13",
+   "precipitation_mm": 4.33
+  },
+  {
+   "date": "2025-06-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-15",
+   "precipitation_mm": 3.13
+  },
+  {
+   "date": "2025-06-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-18",
+   "precipitation_mm": 7.37
+  },
+  {
+   "date": "2025-06-19",
+   "precipitation_mm": 0.54
+  },
+  {
+   "date": "2025-06-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-22",
+   "precipitation_mm": 3.55
+  },
+  {
+   "date": "2025-06-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-25",
+   "precipitation_mm": 5.76
+  },
+  {
+   "date": "2025-06-26",
+   "precipitation_mm": 4.01
+  },
+  {
+   "date": "2025-06-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-06-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-05",
+   "precipitation_mm": 5.65
+  },
+  {
+   "date": "2025-07-06",
+   "precipitation_mm": 4.54
+  },
+  {
+   "date": "2025-07-07",
+   "precipitation_mm": 18.39
+  },
+  {
+   "date": "2025-07-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-12",
+   "precipitation_mm": 4.39
+  },
+  {
+   "date": "2025-07-13",
+   "precipitation_mm": 0.46
+  },
+  {
+   "date": "2025-07-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-15",
+   "precipitation_mm": 1.1
+  },
+  {
+   "date": "2025-07-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-18",
+   "precipitation_mm": 1.36
+  },
+  {
+   "date": "2025-07-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-28",
+   "precipitation_mm": 15.74
+  },
+  {
+   "date": "2025-07-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-07-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-02",
+   "precipitation_mm": 0.13
+  },
+  {
+   "date": "2025-08-03",
+   "precipitation_mm": 4.42
+  },
+  {
+   "date": "2025-08-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-06",
+   "precipitation_mm": 7.25
+  },
+  {
+   "date": "2025-08-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-11",
+   "precipitation_mm": 1.14
+  },
+  {
+   "date": "2025-08-12",
+   "precipitation_mm": 9.04
+  },
+  {
+   "date": "2025-08-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-24",
+   "precipitation_mm": 4.56
+  },
+  {
+   "date": "2025-08-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-08-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-04",
+   "precipitation_mm": 17.18
+  },
+  {
+   "date": "2025-09-05",
+   "precipitation_mm": 25.89
+  },
+  {
+   "date": "2025-09-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-08",
+   "precipitation_mm": 6.98
+  },
+  {
+   "date": "2025-09-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-10",
+   "precipitation_mm": 6.91
+  },
+  {
+   "date": "2025-09-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-12",
+   "precipitation_mm": 1.65
+  },
+  {
+   "date": "2025-09-13",
+   "precipitation_mm": 5.49
+  },
+  {
+   "date": "2025-09-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-16",
+   "precipitation_mm": 20.47
+  },
+  {
+   "date": "2025-09-17",
+   "precipitation_mm": 16.03
+  },
+  {
+   "date": "2025-09-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-20",
+   "precipitation_mm": 5.78
+  },
+  {
+   "date": "2025-09-21",
+   "precipitation_mm": 11.03
+  },
+  {
+   "date": "2025-09-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-23",
+   "precipitation_mm": 1.82
+  },
+  {
+   "date": "2025-09-24",
+   "precipitation_mm": 17.2
+  },
+  {
+   "date": "2025-09-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-28",
+   "precipitation_mm": 1.04
+  },
+  {
+   "date": "2025-09-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-09-30",
+   "precipitation_mm": 2.56
+  },
+  {
+   "date": "2025-10-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-04",
+   "precipitation_mm": 33.83
+  },
+  {
+   "date": "2025-10-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-06",
+   "precipitation_mm": 47.02
+  },
+  {
+   "date": "2025-10-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-08",
+   "precipitation_mm": 5.43
+  },
+  {
+   "date": "2025-10-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-15",
+   "precipitation_mm": 8.31
+  },
+  {
+   "date": "2025-10-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-24",
+   "precipitation_mm": 9.45
+  },
+  {
+   "date": "2025-10-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-26",
+   "precipitation_mm": 0.83
+  },
+  {
+   "date": "2025-10-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-29",
+   "precipitation_mm": 12.65
+  },
+  {
+   "date": "2025-10-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-10-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-06",
+   "precipitation_mm": 1.22
+  },
+  {
+   "date": "2025-11-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-10",
+   "precipitation_mm": 15.22
+  },
+  {
+   "date": "2025-11-11",
+   "precipitation_mm": 6.3
+  },
+  {
+   "date": "2025-11-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-18",
+   "precipitation_mm": 19.75
+  },
+  {
+   "date": "2025-11-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-20",
+   "precipitation_mm": 3.72
+  },
+  {
+   "date": "2025-11-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-27",
+   "precipitation_mm": 25.73
+  },
+  {
+   "date": "2025-11-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-11-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-01",
+   "precipitation_mm": 1.65
+  },
+  {
+   "date": "2025-12-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-04",
+   "precipitation_mm": 6.36
+  },
+  {
+   "date": "2025-12-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-10",
+   "precipitation_mm": 2.42
+  },
+  {
+   "date": "2025-12-11",
+   "precipitation_mm": 13.14
+  },
+  {
+   "date": "2025-12-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-13",
+   "precipitation_mm": 0.15
+  },
+  {
+   "date": "2025-12-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-17",
+   "precipitation_mm": 11.39
+  },
+  {
+   "date": "2025-12-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-20",
+   "precipitation_mm": 8.69
+  },
+  {
+   "date": "2025-12-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-22",
+   "precipitation_mm": 16.33
+  },
+  {
+   "date": "2025-12-23",
+   "precipitation_mm": 7.49
+  },
+  {
+   "date": "2025-12-24",
+   "precipitation_mm": 0.77
+  },
+  {
+   "date": "2025-12-25",
+   "precipitation_mm": 4.74
+  },
+  {
+   "date": "2025-12-26",
+   "precipitation_mm": 0.84
+  },
+  {
+   "date": "2025-12-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-28",
+   "precipitation_mm": 28.23
+  },
+  {
+   "date": "2025-12-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2025-12-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-02",
+   "precipitation_mm": 1.76
+  },
+  {
+   "date": "2026-01-03",
+   "precipitation_mm": 1.0
+  },
+  {
+   "date": "2026-01-04",
+   "precipitation_mm": 0.26
+  },
+  {
+   "date": "2026-01-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-17",
+   "precipitation_mm": 0.17
+  },
+  {
+   "date": "2026-01-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-21",
+   "precipitation_mm": 1.54
+  },
+  {
+   "date": "2026-01-22",
+   "precipitation_mm": 2.36
+  },
+  {
+   "date": "2026-01-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-25",
+   "precipitation_mm": 0.77
+  },
+  {
+   "date": "2026-01-26",
+   "precipitation_mm": 1.97
+  },
+  {
+   "date": "2026-01-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-28",
+   "precipitation_mm": 0.08
+  },
+  {
+   "date": "2026-01-29",
+   "precipitation_mm": 0.82
+  },
+  {
+   "date": "2026-01-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-01-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-03",
+   "precipitation_mm": 4.28
+  },
+  {
+   "date": "2026-02-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-05",
+   "precipitation_mm": 0.56
+  },
+  {
+   "date": "2026-02-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-08",
+   "precipitation_mm": 0.41
+  },
+  {
+   "date": "2026-02-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-10",
+   "precipitation_mm": 0.88
+  },
+  {
+   "date": "2026-02-11",
+   "precipitation_mm": 0.06
+  },
+  {
+   "date": "2026-02-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-13",
+   "precipitation_mm": 0.94
+  },
+  {
+   "date": "2026-02-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-16",
+   "precipitation_mm": 0.45
+  },
+  {
+   "date": "2026-02-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-19",
+   "precipitation_mm": 0.29
+  },
+  {
+   "date": "2026-02-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-21",
+   "precipitation_mm": 0.31
+  },
+  {
+   "date": "2026-02-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-02-27",
+   "precipitation_mm": 2.66
+  },
+  {
+   "date": "2026-02-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-01",
+   "precipitation_mm": 2.7
+  },
+  {
+   "date": "2026-03-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-08",
+   "precipitation_mm": 2.71
+  },
+  {
+   "date": "2026-03-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-11",
+   "precipitation_mm": 0.88
+  },
+  {
+   "date": "2026-03-12",
+   "precipitation_mm": 0.66
+  },
+  {
+   "date": "2026-03-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-03-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-04",
+   "precipitation_mm": 5.52
+  },
+  {
+   "date": "2026-04-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-07",
+   "precipitation_mm": 6.0
+  },
+  {
+   "date": "2026-04-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-09",
+   "precipitation_mm": 2.49
+  },
+  {
+   "date": "2026-04-10",
+   "precipitation_mm": 4.14
+  },
+  {
+   "date": "2026-04-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-14",
+   "precipitation_mm": 1.76
+  },
+  {
+   "date": "2026-04-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-17",
+   "precipitation_mm": 1.99
+  },
+  {
+   "date": "2026-04-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-21",
+   "precipitation_mm": 4.99
+  },
+  {
+   "date": "2026-04-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-04-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-01",
+   "precipitation_mm": 3.46
+  },
+  {
+   "date": "2026-05-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-06",
+   "precipitation_mm": 2.85
+  },
+  {
+   "date": "2026-05-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-14",
+   "precipitation_mm": 4.35
+  },
+  {
+   "date": "2026-05-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-21",
+   "precipitation_mm": 0.74
+  },
+  {
+   "date": "2026-05-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-05-30",
+   "precipitation_mm": 0.4
+  },
+  {
+   "date": "2026-05-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-01",
+   "precipitation_mm": 9.94
+  },
+  {
+   "date": "2026-06-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-03",
+   "precipitation_mm": 3.44
+  },
+  {
+   "date": "2026-06-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-08",
+   "precipitation_mm": 5.06
+  },
+  {
+   "date": "2026-06-09",
+   "precipitation_mm": 0.04
+  },
+  {
+   "date": "2026-06-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-14",
+   "precipitation_mm": 16.23
+  },
+  {
+   "date": "2026-06-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-16",
+   "precipitation_mm": 1.95
+  },
+  {
+   "date": "2026-06-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-24",
+   "precipitation_mm": 2.56
+  },
+  {
+   "date": "2026-06-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-28",
+   "precipitation_mm": 2.75
+  },
+  {
+   "date": "2026-06-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-06-30",
+   "precipitation_mm": 1.72
+  },
+  {
+   "date": "2026-07-01",
+   "precipitation_mm": 9.23
+  },
+  {
+   "date": "2026-07-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-04",
+   "precipitation_mm": 0.2
+  },
+  {
+   "date": "2026-07-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-06",
+   "precipitation_mm": 1.04
+  },
+  {
+   "date": "2026-07-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-08",
+   "precipitation_mm": 4.27
+  },
+  {
+   "date": "2026-07-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-14",
+   "precipitation_mm": 9.19
+  },
+  {
+   "date": "2026-07-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-21",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-29",
+   "precipitation_mm": 1.02
+  },
+  {
+   "date": "2026-07-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-07-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-02",
+   "precipitation_mm": 0.06
+  },
+  {
+   "date": "2026-08-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-05",
+   "precipitation_mm": 7.91
+  },
+  {
+   "date": "2026-08-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-12",
+   "precipitation_mm": 3.32
+  },
+  {
+   "date": "2026-08-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-16",
+   "precipitation_mm": 3.17
+  },
+  {
+   "date": "2026-08-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-20",
+   "precipitation_mm": 16.59
+  },
+  {
+   "date": "2026-08-21",
+   "precipitation_mm": 7.32
+  },
+  {
+   "date": "2026-08-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-25",
+   "precipitation_mm": 3.48
+  },
+  {
+   "date": "2026-08-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-27",
+   "precipitation_mm": 1.17
+  },
+  {
+   "date": "2026-08-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-29",
+   "precipitation_mm": 8.25
+  },
+  {
+   "date": "2026-08-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-08-31",
+   "precipitation_mm": 1.42
+  },
+  {
+   "date": "2026-09-01",
+   "precipitation_mm": 1.77
+  },
+  {
+   "date": "2026-09-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-08",
+   "precipitation_mm": 17.23
+  },
+  {
+   "date": "2026-09-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-11",
+   "precipitation_mm": 0.71
+  },
+  {
+   "date": "2026-09-12",
+   "precipitation_mm": 4.67
+  },
+  {
+   "date": "2026-09-13",
+   "precipitation_mm": 4.38
+  },
+  {
+   "date": "2026-09-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-18",
+   "precipitation_mm": 3.76
+  },
+  {
+   "date": "2026-09-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-21",
+   "precipitation_mm": 4.62
+  },
+  {
+   "date": "2026-09-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-26",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-27",
+   "precipitation_mm": 0.84
+  },
+  {
+   "date": "2026-09-28",
+   "precipitation_mm": 5.92
+  },
+  {
+   "date": "2026-09-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-09-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-06",
+   "precipitation_mm": 0.07
+  },
+  {
+   "date": "2026-10-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-08",
+   "precipitation_mm": 0.27
+  },
+  {
+   "date": "2026-10-09",
+   "precipitation_mm": 1.89
+  },
+  {
+   "date": "2026-10-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-15",
+   "precipitation_mm": 12.21
+  },
+  {
+   "date": "2026-10-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-17",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-18",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-19",
+   "precipitation_mm": 6.14
+  },
+  {
+   "date": "2026-10-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-21",
+   "precipitation_mm": 10.71
+  },
+  {
+   "date": "2026-10-22",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-23",
+   "precipitation_mm": 22.81
+  },
+  {
+   "date": "2026-10-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-25",
+   "precipitation_mm": 44.99
+  },
+  {
+   "date": "2026-10-26",
+   "precipitation_mm": 9.0
+  },
+  {
+   "date": "2026-10-27",
+   "precipitation_mm": 16.31
+  },
+  {
+   "date": "2026-10-28",
+   "precipitation_mm": 25.37
+  },
+  {
+   "date": "2026-10-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-10-31",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-02",
+   "precipitation_mm": 5.51
+  },
+  {
+   "date": "2026-11-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-04",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-08",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-14",
+   "precipitation_mm": 20.93
+  },
+  {
+   "date": "2026-11-15",
+   "precipitation_mm": 8.68
+  },
+  {
+   "date": "2026-11-16",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-17",
+   "precipitation_mm": 1.31
+  },
+  {
+   "date": "2026-11-18",
+   "precipitation_mm": 19.71
+  },
+  {
+   "date": "2026-11-19",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-20",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-21",
+   "precipitation_mm": 23.94
+  },
+  {
+   "date": "2026-11-22",
+   "precipitation_mm": 5.14
+  },
+  {
+   "date": "2026-11-23",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-24",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-25",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-26",
+   "precipitation_mm": 3.93
+  },
+  {
+   "date": "2026-11-27",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-28",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-29",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-11-30",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-01",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-02",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-03",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-04",
+   "precipitation_mm": 1.37
+  },
+  {
+   "date": "2026-12-05",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-06",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-07",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-08",
+   "precipitation_mm": 4.06
+  },
+  {
+   "date": "2026-12-09",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-10",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-11",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-12",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-13",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-14",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-15",
+   "precipitation_mm": 0.0
+  },
+  {
+   "date": "2026-12-16",
+   "precipitation_mm": 0.0
+  }
+ ]
+}

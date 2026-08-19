@@ -221,3 +221,29 @@ backend/climateshield.db
 backend/server.log
 backend/__pycache__/
 backend/**/__pycache__/
+
+# ---- Node.js / frontend ----
+node_modules/
+.next/
+out/
+dist/
+build/
+.vercel/
+.turbo/
+*.tsbuildinfo
+coverage/
+playwright-report/
+npm-debug.log*
+yarn-error.log*
+
+# ---- Environment / secrets (never commit) ----
+.env.local
+.env.*.local
+.env.development
+.env.production
+*.pem
+secrets.json
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
