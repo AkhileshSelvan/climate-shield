@@ -4,7 +4,7 @@
 > current** — 01–09 describe the approved target, this describes what exists in the
 > repository today. Updated after each foundation change.
 
-**Last updated:** 2026-08-17 · Backend `0.2.0` · Engines `trigger-v1.1` / `payout-v1.1`
+**Last updated:** 2026-08-17 · Backend `0.2.0` · Engines `trigger-v1.1` / `payout-v1.1` / `burn-analysis-v1.0`
 
 ## 1. What exists
 
@@ -56,13 +56,13 @@ Each is a deliberate, recorded choice — not drift.
 | Frozen policy trigger definitions | ⚠️ Partial | Terms live on the policy; no DB trigger yet blocks `UPDATE` after issuance |
 | Offline-capable demo | ✅ Verified | Full happy path passes with sockets blocked |
 | Shared PostgreSQL | ⚠️ Configured | `DATABASE_URL` + compose file ready; the team must actually point at one |
-| Tier-1 burn analysis mandatory | ⛔ Not started | Next major workstream |
+| Tier-1 burn analysis mandatory | ✅ **Shipped** `burn-analysis-v1.0` | Pure engine reusing `trigger_engine`; see [11](./11-risk-engine.md) |
 | ML / Claude explanation optional | ✅ Holding | Nothing depends on them. *Product* runtime dependency only — not a developer-tooling requirement. |
 | Admin simulation MUST-HAVE | ✅ Built | `/simulate/*`, idempotent, with reset |
 
 ## 5. Test coverage
 
-38 tests, all passing.
+66 tests, all passing.
 
 | File | Covers |
 |------|--------|
@@ -70,7 +70,8 @@ Each is a deliberate, recorded choice — not drift.
 | `test_idempotency.py` | Double-click, ten rapid calls, per-date separation, DB constraints, reset |
 | `test_money.py` | Decimal round-trip, half-up rounding, float-input safety, API serialisation |
 | `test_weather_offline.py` | Fixture provider, provenance labelling, full happy path with sockets blocked, live-failure containment |
-| `test_architecture.py` | Import-graph fitness — the money path stays clean |
+| `test_architecture.py` | Import-graph fitness — the money path stays clean, and risk cannot reach settlement |
+| `test_risk_engine.py` | Burn analysis: zero/all/partial trigger frequency, threshold boundary, insufficient and missing data, determinism, provenance flags, engine version, no-payout guarantee |
 
 ## 6. Commands
 
@@ -91,7 +92,7 @@ GitHub issues #4–#7 are the source of truth for who owns what. Mapping onto th
 
 | Area | Owner | Issue |
 |------|-------|-------|
-| `app/services/risk/`, `app/services/explain/` *(not yet built)*, `docs/` | Akhilesh | [#4](https://github.com/AkhileshSelvan/climate-shield/issues/4) |
+| `app/services/risk/` **(built)**, `app/services/explain/` *(not yet built)*, `docs/` | Akhilesh | [#4](https://github.com/AkhileshSelvan/climate-shield/issues/4) |
 | `app/core/`, `app/models.py`, `app/api/`, `alembic/`, `requirements.txt`, `docker-compose.yml` | Bhagavathianu | [#5](https://github.com/AkhileshSelvan/climate-shield/issues/5) |
 | `frontend/` *(not yet started)* | Karthik | [#6](https://github.com/AkhileshSelvan/climate-shield/issues/6) |
 | `app/services/{weather,trigger_engine,payout_engine,evaluation}`, `seeds/`, `tests/` | Kirishwaran | [#7](https://github.com/AkhileshSelvan/climate-shield/issues/7) |
@@ -116,7 +117,7 @@ auth and standing up the shared PostgreSQL instance.
 |---|------|-------|-------|
 | 1 | **Replace synthetic fixtures with real ERA5** — `make fixtures-live`. Top blocker: everything else is honest engineering on placeholder data. | Kirishwaran | #7 |
 | 2 | **Review and merge PR #3**, then stand up the shared PostgreSQL instance | Bhagavathianu | #5 |
-| 3 | **Tier-1 burn analysis** — the mandatory risk engine, still entirely absent. Largest plan-vs-reality gap. | Akhilesh | #4 |
+| 3 | ~~Tier-1 burn analysis~~ — ✅ shipped as `burn-analysis-v1.0`. Next: crop calendars and sowing-date-anchored windows. | Akhilesh | #4 |
 | 4 | **Next.js foundation and farmer journey** — unblocked now; the API is stable and works offline | Karthik | #6 |
 | 5 | Tiered payouts (25/50/100) replacing the flat 30 % | Kirishwaran | #7 |
 | 6 | Authentication (M1) | Bhagavathianu | #5 |

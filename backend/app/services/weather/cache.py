@@ -12,7 +12,11 @@ from sqlalchemy.orm import Session
 
 from app import models
 from app.services.weather import grid
-from app.services.weather.providers import WeatherProvider, get_provider
+from app.services.weather.providers import (
+    WeatherProvider,
+    get_provider,
+    is_synthetic_source,
+)
 
 SIMULATED_SOURCE = "simulated"
 
@@ -103,12 +107,18 @@ def ingest(
     provider = provider or get_provider()
     cell = get_or_create_cell(db, latitude, longitude)
     rows = provider.fetch_daily_precipitation(float(cell.latitude), float(cell.longitude), start, end)
-    written = upsert_observations(db, cell, rows, source=provider.name)
+    # Record who produced the numbers, not who handed them over. A fixture file
+    # refreshed by `make fixtures-live` holds real ERA5 measurements, and storing
+    # those as "fixture" would let downstream callers call them synthetic.
+    source = provider.source_for(float(cell.latitude), float(cell.longitude))
+    written = upsert_observations(db, cell, rows, source=source)
     return {
         "grid_cell_id": cell.id,
         "latitude": float(cell.latitude),
         "longitude": float(cell.longitude),
         "provider": provider.name,
+        "source": source,
+        "synthetic": is_synthetic_source(source),
         "start_date": start.isoformat(),
         "end_date": end.isoformat(),
         "observations_written": written,
