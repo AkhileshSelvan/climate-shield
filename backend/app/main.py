@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api.v1 import farms, payouts, policies, simulate, triggers, weather
+from app.api.v1 import farms, payouts, policies, risk, simulate, triggers, weather
 from app.core.config import get_settings
 from app.core.database import Base, engine
 
@@ -24,7 +24,7 @@ if engine.dialect.name == "sqlite":
     Base.metadata.create_all(bind=engine)
 
 API_PREFIX = "/api/v1"
-ROUTERS = (farms, weather, policies, triggers, payouts, simulate)
+ROUTERS = (farms, weather, policies, triggers, payouts, simulate, risk)
 
 for module in ROUTERS:
     app.include_router(module.router, prefix=API_PREFIX)

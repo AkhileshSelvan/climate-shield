@@ -74,3 +74,86 @@ def test_no_endpoint_creates_a_payout_directly():
         if "models.Payout(" in path.read_text():
             offenders.append(path.name)
     assert not offenders, f"API modules constructing Payout directly: {offenders}"
+
+
+# ---------------------------------------------------------------------------
+# Risk engine isolation: risk estimates, it never settles.
+# ---------------------------------------------------------------------------
+
+RISK_DIR = APP_DIR / "services" / "risk"
+
+# The risk engine may read the weather cache and call the trigger engine. It may
+# never reach anything that authorises or records money.
+RISK_FORBIDDEN_IMPORTS = (
+    "app.services.payout_engine",
+    "app.services.evaluation",
+    "anthropic", "openai",
+    # Tier-2/Tier-3 methods are out of scope for Tier-1 and must stay out until
+    # they are deliberately introduced.
+    "sklearn", "lightgbm", "xgboost", "torch", "tensorflow", "statsmodels",
+    "requests", "httpx", "urllib",
+)
+
+# The pure layer must additionally stay free of the database.
+RISK_PURE_MODULES = (
+    RISK_DIR / "burn_analysis.py",
+    RISK_DIR / "classification.py",
+)
+
+
+def test_risk_engine_cannot_reach_payout_or_settlement():
+    violations = []
+    for path in RISK_DIR.rglob("*.py"):
+        for imported in _imports(path):
+            for prefix in RISK_FORBIDDEN_IMPORTS:
+                if imported == prefix or imported.startswith(prefix + "."):
+                    violations.append(f"{path.name} imports {imported}")
+    assert not violations, (
+        "risk engine reaches settlement, ML or network code: " + "; ".join(violations)
+    )
+
+
+def test_risk_engine_never_constructs_a_payout_or_trigger():
+    """Only the evaluation service may create these rows."""
+    offenders = []
+    for path in RISK_DIR.rglob("*.py"):
+        text = path.read_text()
+        for forbidden in ("models.Payout(", "models.Trigger("):
+            if forbidden in text:
+                offenders.append(f"{path.name}: {forbidden}")
+    assert not offenders, f"risk modules constructing settlement rows: {offenders}"
+
+
+def test_risk_api_exposes_no_write_endpoint():
+    """Risk endpoints POST for convenience, but must not persist anything."""
+    text = (APP_DIR / "api" / "v1" / "risk.py").read_text()
+    for forbidden in ("db.add(", "db.commit(", "db.delete(", "models.Payout(", "models.Trigger("):
+        assert forbidden not in text, f"risk router performs a write: {forbidden}"
+
+
+def test_risk_pure_layer_has_no_database_dependency():
+    """burn_analysis and classification must run without a database."""
+    forbidden = ("sqlalchemy", "app.models", "app.core.database", "app.services.weather")
+    violations = []
+    for path in RISK_PURE_MODULES:
+        for imported in _imports(path):
+            for prefix in forbidden:
+                if imported == prefix or imported.startswith(prefix + "."):
+                    violations.append(f"{path.name} imports {imported}")
+    assert not violations, f"pure risk layer touches the database: {violations}"
+
+
+def test_burn_analysis_reuses_the_trigger_engine():
+    """There must be exactly one definition of drought/excess-rain."""
+    text = (RISK_DIR / "burn_analysis.py").read_text()
+    assert "trigger_engine" in _imports(RISK_DIR / "burn_analysis.py") or any(
+        i.endswith("trigger_engine") or i == "app.services" for i in _imports(RISK_DIR / "burn_analysis.py")
+    ), "burn analysis must import the trigger engine"
+    assert "trigger_engine.evaluate_trigger(" in text, (
+        "burn analysis must call trigger_engine.evaluate_trigger rather than "
+        "restating the comparison"
+    )
+    # Guard against a second, drifting definition of the comparison.
+    assert "< threshold" not in text and "> threshold" not in text, (
+        "burn analysis appears to reimplement the threshold comparison"
+    )
