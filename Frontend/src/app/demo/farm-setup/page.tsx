@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDemo } from "@/context/DemoContext";
 import { StepIndicator } from "@/components/ui/StepIndicator";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   Card,
   Button,
@@ -17,6 +18,7 @@ import { LOCATIONS, CROPS, CROP_STAGES, DEMO_DEFAULTS } from "@/lib/types";
 export default function FarmSetupPage() {
   const router = useRouter();
   const { setFarm, setCurrentStep } = useDemo();
+  const { t } = useLanguage();
 
   // Pre-fill with demo defaults so the Golden Demo runs one-click
   const [farmerName, setFarmerName] = useState<string>(DEMO_DEFAULTS.farmer_name);
@@ -78,7 +80,7 @@ export default function FarmSetupPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-100">
-            <span className="gradient-text">Farm Setup</span>
+            <span className="gradient-text">{t("Farm Setup")}</span>
           </h1>
           <p className="text-gray-400 mt-2">
             Enter your farm details to begin the climate risk analysis and insurance setup.
@@ -173,7 +175,7 @@ export default function FarmSetupPage() {
               loading={loading}
               size="lg"
             >
-              Continue — Analyze Risk
+              {t("Continue — Analyze Risk")}
               <svg
                 className="w-5 h-5"
                 fill="none"

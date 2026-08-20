@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDemo } from "@/context/DemoContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import {
   Card,
@@ -20,6 +21,7 @@ import { TRIGGER_TYPES, DEMO_DEFAULTS } from "@/lib/types";
 export default function PolicyPage() {
   const router = useRouter();
   const { farm, riskAnalysis, policy, setPolicy, setCurrentStep } = useDemo();
+  const { t } = useLanguage();
 
   // Pre-fill with demo defaults
   const [coverageAmount, setCoverageAmount] = useState<string>(DEMO_DEFAULTS.coverage_amount);
@@ -105,7 +107,7 @@ export default function PolicyPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-100">
-            <span className="gradient-text">Insurance Policy</span>
+            <span className="gradient-text">{t("Policy Details")}</span>
           </h1>
           <p className="text-gray-400 mt-2">
             {created
@@ -232,7 +234,7 @@ export default function PolicyPage() {
                 loading={loading}
                 size="lg"
               >
-                Create Policy
+                {t("Create Policy")}
               </Button>
             </div>
           </Card>
