@@ -14,8 +14,13 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# Anchored to the repository root. Unanchored, these match a `lib/` directory at
+# any depth — which silently swallowed Frontend/src/lib/, so a new module there
+# was skipped by `git add` and the app failed to build on a clean checkout.
+# Virtualenvs are unaffected: they are excluded wholesale by .venv / venv/ /
+# env/ / backend/venv/ below, not by this rule.
+/lib/
+/lib64/
 parts/
 sdist/
 var/
