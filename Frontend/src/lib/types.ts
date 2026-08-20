@@ -259,4 +259,11 @@ export const DEMO_DEFAULTS = {
   window_days: 30,
   coverage_amount: "72000.00",
   premium: "2169.00",
+  // Pinned demo season anchor. Burn analysis aligns every historical season to
+  // this calendar position, so leaving it unset (the API defaults to today)
+  // makes the rehearsed number drift day to day — it read 20.00% on 19 August
+  // and 22.86% on the 20th. Sent on every demo risk request so the Golden Demo
+  // is reproducible. Must match DEMO_SEASON_END in backend/seeds/seed_demo.py;
+  // backend/tests/test_demo_config.py fails if the two drift apart.
+  season_end: "2026-08-19",
 } as const;

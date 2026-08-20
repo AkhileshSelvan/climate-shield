@@ -54,11 +54,16 @@ export default function RiskAnalysisPage() {
     try {
       // The risk API requires trigger_type, threshold_mm, window_days.
       // Use demo defaults for the Golden Demo flow.
+      //
+      // season_end pins the calendar position every historical season is
+      // aligned to. Without it the API anchors on today, and the rehearsed
+      // score moves as the window slides forward day by day.
       const result = await analyzeRisk({
         farm_id: farm.id,
         trigger_type: DEMO_DEFAULTS.trigger_type,
         threshold_mm: DEMO_DEFAULTS.threshold_mm,
         window_days: DEMO_DEFAULTS.window_days,
+        season_end: DEMO_DEFAULTS.season_end,
       });
 
       setRiskAnalysis(result);
