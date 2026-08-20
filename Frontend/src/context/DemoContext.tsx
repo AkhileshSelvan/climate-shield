@@ -39,7 +39,13 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<DemoState>(initialState);
 
   const setFarm = useCallback((farm: Farm) => {
-    setState((prev) => ({ ...prev, farm }));
+    setState((prev) => ({
+      ...prev,
+      farm,
+      riskAnalysis: null,
+      policy: null,
+      simulationResult: null,
+    }));
   }, []);
 
   const setRiskAnalysis = useCallback((riskAnalysis: RiskAnalysis) => {
