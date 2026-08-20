@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useDemo } from "@/context/DemoContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import {
   Card,
@@ -19,6 +20,7 @@ import { simulateDrought, simulateExcessRain } from "@/lib/api";
 export default function PayoutPage() {
   const router = useRouter();
   const { farm, policy, simulationResult, setSimulationResult, resetDemo } = useDemo();
+  const { t } = useLanguage();
 
   const [retesting, setRetesting] = useState(false);
   const [retestError, setRetestError] = useState<string | null>(null);
@@ -90,7 +92,7 @@ export default function PayoutPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-100">
-              <span className="gradient-text">Payout Result</span>
+              <span className="gradient-text">{t("Payout Evaluation")}</span>
             </h1>
             <p className="text-gray-400 mt-2">
               Final settlement for your parametric insurance policy.

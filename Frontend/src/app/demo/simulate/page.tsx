@@ -12,12 +12,15 @@ import {
   ErrorState,
   SimulatedBadge,
 } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { simulateDrought, simulateExcessRain } from "@/lib/api";
 
 export default function SimulatePage() {
   const router = useRouter();
   const { farm, policy, simulationResult, setSimulationResult, setCurrentStep } =
     useDemo();
+  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,14 +101,20 @@ export default function SimulatePage() {
       <div className="max-w-3xl mx-auto mt-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-100">
-              <span className="gradient-text">Climate Event Simulator</span>
-            </h1>
-            <p className="text-gray-400 mt-2">
-              Simulate a {isDrought ? "drought" : "excessive rainfall"} event to
-              test the parametric trigger.
-            </p>
+          <div className="flex items-center justify-between mb-8 w-full">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-100">
+                <span className="gradient-text">{t("Simulate Climate Event")}</span>
+              </h1>
+              <p className="text-gray-400 mt-2">
+                Simulate weather conditions to test the parametric trigger.
+              </p>
+            </div>
+            {simulationResult && (
+              <ReadAloudButton 
+                textKey={simulationResult.triggered ? "simulate_read_aloud_trigger" : "simulate_read_aloud_no_trigger"} 
+              />
+            )}
           </div>
           <SimulatedBadge />
         </div>
@@ -210,7 +219,7 @@ export default function SimulatePage() {
               className="w-full"
               variant={wouldTrigger ? "danger" : "primary"}
             >
-              {loading ? "Running Simulation..." : "Run Simulation"}
+              {loading ? "Running Simulation..." : t("Run Simulation")}
             </Button>
           </div>
         </Card>
@@ -254,14 +263,26 @@ export default function SimulatePage() {
                   }`}
                 >
                   {simulationResult.triggered
-                    ? "⚡ TRIGGER ACTIVATED"
-                    : "✓ No Trigger"}
+                    ? "⚠️ TRIGGER ACTIVATED"
+                    : "✅ No Trigger"}
                 </h2>
 
                 <p className="text-gray-400 mt-2 text-sm">
                   Observed: {simulationResult.observed_rainfall_mm}mm vs Threshold:{" "}
                   {simulationResult.threshold_mm}mm
                 </p>
+
+                {!simulationResult.triggered && (
+                  <div className="mt-4 p-3 bg-climate-500/10 border border-climate-500/20 rounded-lg text-sm text-climate-100 text-left">
+                    <p className="font-semibold mb-1">Near Miss Analysis</p>
+                    <p>
+                      The observed rainfall was {simulationResult.observed_rainfall_mm}mm. 
+                      This is {Math.abs(simulationResult.observed_rainfall_mm - simulationResult.threshold_mm).toFixed(1)}mm 
+                      {simulationResult.trigger_type === 'drought' ? ' above ' : ' below '} 
+                      the threshold of {simulationResult.threshold_mm}mm.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -317,7 +338,7 @@ export default function SimulatePage() {
             {simulationResult.triggered && (
               <div className="flex justify-end pt-2">
                 <Button id="view-payout-btn" onClick={handleContinue} size="lg">
-                  View Payout
+                  {t("View Payout")}
                   <svg
                     className="w-5 h-5"
                     fill="none"

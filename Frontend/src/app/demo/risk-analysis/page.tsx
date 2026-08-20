@@ -14,6 +14,8 @@ import {
   SimulatedBadge,
 } from "@/components/ui";
 import { RiskScoreRing } from "@/components/RiskScoreRing";
+import { useLanguage } from "@/context/LanguageContext";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { analyzeRisk } from "@/lib/api";
 import { DEMO_DEFAULTS } from "@/lib/types";
 import type { RiskAnalysis } from "@/lib/types";
@@ -29,6 +31,7 @@ const RISK_LEVEL_VARIANT = {
 export default function RiskAnalysisPage() {
   const router = useRouter();
   const { farm, riskAnalysis, setRiskAnalysis, setCurrentStep } = useDemo();
+  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,13 +102,24 @@ export default function RiskAnalysisPage() {
       <div className="mt-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-100">
-              <span className="gradient-text">Climate Risk Analysis</span>
-            </h1>
-            <p className="text-gray-400 mt-2">
-              {farm.crop} farm in {farm.location} • {farm.area_acres} acres
-            </p>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-100">
+                <span className="gradient-text">{t("Risk Analysis")}</span>
+              </h1>
+              <p className="text-gray-400 mt-2">
+                Climate risk assessment for {farm.farmer_name}'s farm.
+              </p>
+            </div>
+            {riskAnalysis && (
+              <ReadAloudButton 
+                textKey="risk_read_aloud" 
+                values={{ 
+                  level: riskAnalysis.risk_level, 
+                  freq: riskAnalysis.trigger_frequency ? (riskAnalysis.trigger_frequency * 100).toFixed(0) : "0" 
+                }} 
+              />
+            )}
           </div>
           {riskAnalysis?.is_simulated && <SimulatedBadge />}
         </div>
@@ -178,9 +192,12 @@ export default function RiskAnalysisPage() {
 
                   {/* Data quality & source */}
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="info" size="sm">
-                      Data: {riskAnalysis.data_quality}
-                    </Badge>
+                      <Badge variant="success" size="sm">
+                        Data: {riskAnalysis.data_quality === "sufficient" ? "✅ sufficient" :
+                               riskAnalysis.data_quality === "limited" ? "⚠️ limited" :
+                               riskAnalysis.data_quality === "insufficient" ? "❌ insufficient" :
+                               riskAnalysis.data_quality}
+                      </Badge>
                     {riskAnalysis.data_source?.map((src, i) => (
                       <Badge key={i} variant="info" size="sm">
                         Source: {src}
@@ -222,8 +239,11 @@ export default function RiskAnalysisPage() {
 
               <MetricCard
                 label="Risk Score"
-                value={`${riskAnalysis.risk_score ?? "—"}/100`}
-                subtitle={`${riskAnalysis.risk_level} severity`}
+                value={`${riskAnalysis.risk_score ?? "--"}/100`}
+                subtitle={`${riskAnalysis.risk_level === "LOW" ? "🟢" :
+                           riskAnalysis.risk_level === "MEDIUM" ? "🟡" :
+                           riskAnalysis.risk_level === "HIGH" ? "🟠" :
+                           riskAnalysis.risk_level === "SEVERE" ? "🔴" : "⚪"} ${riskAnalysis.risk_level} severity`}
                 variant={
                   riskAnalysis.risk_level === "SEVERE"
                     ? "danger"
@@ -263,7 +283,7 @@ export default function RiskAnalysisPage() {
             {/* Continue button */}
             <div className="flex justify-end pt-2">
               <Button id="view-policy-btn" onClick={handleContinue} size="lg">
-                View Policy
+                {t("Continue — Review Policy")}
                 <svg
                   className="w-5 h-5"
                   fill="none"
