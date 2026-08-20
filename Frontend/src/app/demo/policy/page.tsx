@@ -1,0 +1,363 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useDemo } from "@/context/DemoContext";
+import { StepIndicator } from "@/components/ui/StepIndicator";
+import {
+  Card,
+  Badge,
+  Button,
+  Input,
+  Select,
+  Loader,
+  ErrorState,
+  MetricCard,
+} from "@/components/ui";
+import { createPolicy } from "@/lib/api";
+import { TRIGGER_TYPES, DEMO_DEFAULTS } from "@/lib/types";
+
+export default function PolicyPage() {
+  const router = useRouter();
+  const { farm, riskAnalysis, policy, setPolicy, setCurrentStep } = useDemo();
+
+  // Pre-fill with demo defaults
+  const [coverageAmount, setCoverageAmount] = useState<string>(DEMO_DEFAULTS.coverage_amount);
+  const [premium, setPremium] = useState<string>(DEMO_DEFAULTS.premium);
+  const [triggerType, setTriggerType] = useState<string>(DEMO_DEFAULTS.trigger_type);
+  const [thresholdMm, setThresholdMm] = useState<string>(String(DEMO_DEFAULTS.threshold_mm));
+  const [windowDays, setWindowDays] = useState<string>(String(DEMO_DEFAULTS.window_days));
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [created, setCreated] = useState(false);
+
+  useEffect(() => {
+    if (!farm) {
+      router.push("/demo/farm-setup");
+      return;
+    }
+    if (!riskAnalysis) {
+      router.push("/demo/risk-analysis");
+      return;
+    }
+    if (policy) {
+      setCreated(true);
+    }
+  }, [farm, riskAnalysis, policy, router]);
+
+  async function handleCreatePolicy() {
+    if (!farm) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Backend PolicyCreate requires: farm_id, coverage_amount (Decimal),
+      // premium (Decimal), trigger_type, threshold_mm, window_days
+      const result = await createPolicy({
+        farm_id: farm.id,
+        coverage_amount: coverageAmount,
+        premium: premium,
+        trigger_type: triggerType,
+        threshold_mm: parseFloat(thresholdMm),
+        window_days: parseInt(windowDays),
+      });
+
+      setPolicy(result);
+      setCreated(true);
+    } catch (err) {
+      console.error("Policy creation failed:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create policy. Is the backend running?"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleContinue() {
+    setCurrentStep("simulate");
+    router.push("/demo/simulate");
+  }
+
+  if (!farm || !riskAnalysis) return null;
+
+  // Format currency string (backend returns decimal strings)
+  function formatCurrency(val: string | number | null): string {
+    if (val == null) return "—";
+    const num = typeof val === "string" ? parseFloat(val) : val;
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(num);
+  }
+
+  return (
+    <div className="animate-fade-in">
+      <StepIndicator currentStep="policy" />
+
+      <div className="max-w-3xl mx-auto mt-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-100">
+            <span className="gradient-text">Insurance Policy</span>
+          </h1>
+          <p className="text-gray-400 mt-2">
+            {created
+              ? "Your parametric insurance policy has been created."
+              : "Configure your parametric insurance coverage."}
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-6">
+            <ErrorState
+              title="Policy Creation Failed"
+              message={error}
+              onRetry={() => setError(null)}
+            />
+          </div>
+        )}
+
+        {!created ? (
+          /* ─── Policy creation form ─── */
+          <Card>
+            <div className="space-y-5">
+              {/* Farm info summary */}
+              <div className="bg-navy-800/50 rounded-xl p-4 border border-gray-800">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  Farm Details
+                </p>
+                <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                  <span>🌾 {farm.crop}</span>
+                  <span>📍 {farm.location}</span>
+                  <span>📐 {farm.area_acres} acres</span>
+                  <span>
+                    Risk:{" "}
+                    <Badge
+                      variant={
+                        riskAnalysis.risk_level === "LOW"
+                          ? "low"
+                          : riskAnalysis.risk_level === "MEDIUM"
+                          ? "medium"
+                          : riskAnalysis.risk_level === "HIGH"
+                          ? "high"
+                          : riskAnalysis.risk_level === "SEVERE"
+                          ? "severe"
+                          : "info"
+                      }
+                      size="sm"
+                    >
+                      {riskAnalysis.risk_level}
+                    </Badge>
+                  </span>
+                </div>
+              </div>
+
+              <Input
+                id="coverage-amount"
+                label="Coverage Amount (₹)"
+                value={coverageAmount}
+                onChange={setCoverageAmount}
+                type="number"
+                min={1000}
+                step={1000}
+                required
+                helpText="Maximum payout amount in case of trigger activation"
+              />
+
+              <Input
+                id="premium-amount"
+                label="Premium (₹)"
+                value={premium}
+                onChange={setPremium}
+                type="number"
+                min={0}
+                step={1}
+                required
+                helpText="Premium amount for this policy"
+              />
+
+              <Select
+                id="trigger-type"
+                label="Trigger Type"
+                value={triggerType}
+                onChange={setTriggerType}
+                options={TRIGGER_TYPES.map((t) => ({
+                  value: t.value,
+                  label: t.label,
+                }))}
+                required
+              />
+
+              <Input
+                id="threshold-mm"
+                label="Threshold (mm rainfall)"
+                value={thresholdMm}
+                onChange={setThresholdMm}
+                type="number"
+                min={1}
+                step={1}
+                required
+                helpText={
+                  triggerType === "drought"
+                    ? "Trigger activates if rainfall drops BELOW this threshold"
+                    : "Trigger activates if rainfall exceeds this threshold"
+                }
+              />
+
+              <Input
+                id="window-days"
+                label="Window (days)"
+                value={windowDays}
+                onChange={setWindowDays}
+                type="number"
+                min={1}
+                max={366}
+                step={1}
+                required
+                helpText="Number of days in the evaluation window"
+              />
+            </div>
+
+            <div className="mt-8 flex justify-end">
+              <Button
+                id="create-policy-btn"
+                onClick={handleCreatePolicy}
+                loading={loading}
+                size="lg"
+              >
+                Create Policy
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          /* ─── Policy view ─── */
+          <div className="space-y-6">
+            {loading && <Loader text="Creating policy..." />}
+
+            {policy && (
+              <>
+                {/* Policy status card */}
+                <Card className="!p-8">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Policy #{policy.id}
+                      </p>
+                      <h2 className="text-2xl font-bold text-gray-100 mt-1">
+                        Parametric Insurance
+                      </h2>
+                    </div>
+                    <Badge
+                      variant={
+                        policy.status === "active" ? "success" : "warning"
+                      }
+                      size="lg"
+                    >
+                      {policy.status?.toUpperCase() || "ACTIVE"}
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <MetricCard
+                      label="Coverage Amount"
+                      value={formatCurrency(policy.coverage_amount)}
+                      variant="success"
+                    />
+                    <MetricCard
+                      label="Premium"
+                      value={formatCurrency(policy.premium)}
+                      subtitle="From backend calculation"
+                      variant="info"
+                    />
+                  </div>
+                </Card>
+
+                {/* Trigger details */}
+                <Card>
+                  <h3 className="text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">
+                    Trigger Configuration
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-800/50">
+                      <span className="text-sm text-gray-400">
+                        Trigger Type
+                      </span>
+                      <Badge variant="info">
+                        {policy.trigger_type === "drought"
+                          ? "🌵 Drought"
+                          : "🌧️ Excess Rainfall"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-800/50">
+                      <span className="text-sm text-gray-400">
+                        Threshold
+                      </span>
+                      <span className="text-sm font-semibold text-gray-200">
+                        {policy.threshold_mm} mm
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-800/50">
+                      <span className="text-sm text-gray-400">
+                        Window
+                      </span>
+                      <span className="text-sm font-semibold text-gray-200">
+                        {policy.window_days} days
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-800/50">
+                      <span className="text-sm text-gray-400">
+                        Condition
+                      </span>
+                      <span className="text-sm text-gray-300">
+                        {policy.trigger_type === "drought"
+                          ? `Rainfall < ${policy.threshold_mm}mm`
+                          : `Rainfall > ${policy.threshold_mm}mm`}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm text-gray-400">Farm</span>
+                      <span className="text-sm text-gray-300">
+                        {farm.crop} • {farm.location}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Continue */}
+                <div className="flex justify-end pt-2">
+                  <Button
+                    id="simulate-event-btn"
+                    onClick={handleContinue}
+                    size="lg"
+                  >
+                    Simulate Climate Event
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
