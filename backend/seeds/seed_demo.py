@@ -63,6 +63,29 @@ DEMO_FARM = {
 # one season in five — a frequency a parametric product could plausibly insure.
 DEMO_THRESHOLD_MM = 30.0
 
+# DEMO SEASON ANCHOR — pinned so the rehearsed number is reproducible.
+#
+# Burn analysis aligns every historical season to the same calendar position as
+# `season_end`, so an anchor of `today` makes the result move by the day. It did:
+# the same fixtures, threshold and window read 7 triggered seasons (20.00%) on
+# 19 August and 8 (22.86%) on the 20th, because one more season crossed the
+# threshold as the window slid forward. Both numbers are correct; neither is
+# stable enough to rehearse against or to print in a slide.
+#
+# Pinning the anchor fixes the calendar position, not the analysis. The engine,
+# its coverage rules, its bands and the fixtures are all untouched, and the
+# request still travels through the ordinary `season_end` field of the public
+# risk API — no demo-only code path exists in the engine.
+#
+# Measured at this anchor on the committed fixtures: 35 of 35 seasons eligible,
+# 7 triggered, 20.00%, MEDIUM, sufficient/high. Neighbouring anchors stay inside
+# the MEDIUM band (17.14%–22.86% over 17–21 August), so the pin is not balanced
+# on a band boundary — only the exact score depends on it.
+#
+# The frontend carries the same date in DEMO_DEFAULTS.season_end and sends it
+# with every demo risk request; tests/test_demo_config.py fails if the two drift.
+DEMO_SEASON_END = date(2026, 8, 19)
+
 DEMO_POLICY = {
     "coverage_amount": Decimal("72000.00"),
     "premium": Decimal("2169.00"),

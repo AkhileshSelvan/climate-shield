@@ -96,6 +96,9 @@ def test_golden_demo_produces_the_expected_risk_result(db_session):
         threshold_mm=policy.threshold_mm,
         window_days=policy.window_days,
         farm_id=farm.id,
+        # The anchor the demo pins. Without it this asserts against whatever
+        # today happens to be, and the expected numbers below expire overnight.
+        season_end=seed_demo.DEMO_SEASON_END,
     )
 
     assert result["historical_years"] == 35
@@ -190,3 +193,89 @@ def test_a_coverage_change_is_caught_too(db_session):
 
     with pytest.raises(seed_demo.DemoSeedError, match="coverage_amount"):
         seed_demo.seed_demo_entities(db_session)
+
+
+# --- The pinned season anchor -------------------------------------------------
+#
+# Burn analysis aligns every historical season to the calendar position of
+# `season_end`. Anchored on today, the demo's own numbers move: the same
+# fixtures, threshold and window gave 7 triggered seasons (20.00%) on
+# 19 August 2026 and 8 (22.86%) on the 20th. The engine was right both times.
+# A rehearsed demo needs one of them, every time.
+
+
+def test_the_demo_season_anchor_is_pinned():
+    """A fixed date, not a moving one — the whole point of the pin."""
+    assert seed_demo.DEMO_SEASON_END == date(2026, 8, 19)
+    assert isinstance(seed_demo.DEMO_SEASON_END, date)
+
+
+def test_the_frontend_sends_the_same_pinned_anchor():
+    """Two sources of truth would silently disagree; this makes them fail loudly.
+
+    The frontend holds its own copy because it builds the request. If either
+    side is edited alone the demo goes back to drifting, so the copies are
+    compared directly rather than trusted.
+    """
+    frontend = SEED_SOURCE.parents[2] / "Frontend" / "src" / "lib" / "types.ts"
+    if not frontend.exists():                       # backend-only checkouts
+        pytest.skip("frontend not present in this checkout")
+
+    source = frontend.read_text()
+    expected = seed_demo.DEMO_SEASON_END.isoformat()
+    assert f'season_end: "{expected}"' in source, (
+        f"Frontend DEMO_DEFAULTS.season_end must be {expected} to match "
+        f"seed_demo.DEMO_SEASON_END"
+    )
+
+    # Declaring it is not enough — it has to be sent.
+    page = frontend.parents[1] / "app" / "demo" / "risk-analysis" / "page.tsx"
+    assert "season_end: DEMO_DEFAULTS.season_end" in page.read_text(), (
+        "The demo risk request must pass season_end, or the API anchors on today"
+    )
+
+
+@pytest.mark.slow
+def test_the_pinned_anchor_is_what_produces_the_rehearsed_number(db_session):
+    """The pin earns its place only if it changes the answer.
+
+    Guards against someone pinning a date that happens to match today: this
+    asserts the rehearsed result holds at the anchor and that the anchor is
+    doing the work, not the clock.
+    """
+    pytest.importorskip("app.services.risk.service")
+    from app.services.risk.service import analyse_risk
+    from app.services.weather import cache
+    from app.services.weather.providers import FixtureProvider
+
+    end = date.today()
+    cache.ingest(
+        db_session, 11.0, 77.0,
+        end - timedelta(days=seed_demo.DEMO_LOOKBACK_DAYS), end,
+        provider=FixtureProvider(),
+    )
+    farm, policy = seed_demo.seed_demo_entities(db_session)
+
+    def score_at(anchor):
+        return analyse_risk(
+            db_session,
+            trigger_type=policy.trigger_type,
+            threshold_mm=policy.threshold_mm,
+            window_days=policy.window_days,
+            farm_id=farm.id,
+            season_end=anchor,
+        )
+
+    pinned = score_at(seed_demo.DEMO_SEASON_END)
+    assert pinned["eligible_years"] == 35
+    assert pinned["triggered_years"] == 7
+    assert pinned["risk_score"] == 20.0
+    assert pinned["risk_level"] == "MEDIUM"
+
+    # The earliest season the pin reaches for must still be fully cached. The
+    # seed loads a fixed number of days back from *today*, so that lower edge
+    # creeps forward while the anchor stays put; this is the canary.
+    assert pinned["eligible_years"] == pinned["historical_years"], (
+        "The pinned anchor now reaches past the seeded cache. Increase "
+        "DEMO_LOOKBACK_DAYS or move the anchor."
+    )
